@@ -1,0 +1,26 @@
+[tool.poetry]
+name = "ska-ser-headlamp-plugins"
+version = "0.0.1"
+description = "SKA Headlamp Plugins"
+authors = ["System Team"]
+license = "BSD-3-Clause"
+
+[[tool.poetry.source]]
+name = 'ska-nexus'
+url = 'https://artefact.skao.int/repository/pypi-internal/simple'
+
+[[tool.poetry.source]]
+name = "PyPI-public"
+url = 'https://pypi.org/simple'
+
+[tool.poetry.dependencies]
+python = "^3.10"
+
+[tool.poetry.group.docs.dependencies]
+sphinx = "^7.4.5"
+sphinx-rtd-theme = "^2.0.0"
+recommonmark = "^0.7.1"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
