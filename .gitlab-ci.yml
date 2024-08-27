@@ -1,0 +1,36 @@
+variables:
+  GIT_SUBMODULE_STRATEGY: recursive
+  ENVIRONMENT: ci
+  JS_NODE_VERSION: 20
+
+default:
+  image: $SKA_K8S_TOOLS_BUILD_DEPLOY
+
+stages:
+  - lint
+  - join-reports
+  - build
+  - test
+  - scan
+  - pages
+  - publish
+
+js-lint:
+  rules:
+    - when: always
+
+include:
+  - project: "ska-telescope/templates-repository"
+    file: "gitlab-ci/includes/oci-image.gitlab-ci.yml"
+
+  - project: "ska-telescope/templates-repository"
+    file: "gitlab-ci/includes/js-lint.gitlab-ci.yml"
+
+  - project: "ska-telescope/templates-repository"
+    file: "gitlab-ci/includes/release.gitlab-ci.yml"
+
+  - project: "ska-telescope/templates-repository"
+    file: "gitlab-ci/includes/docs.gitlab-ci.yml"
+
+  - project: "ska-telescope/templates-repository"
+    file: "gitlab-ci/includes/finaliser.gitlab-ci.yml"
