@@ -4,6 +4,8 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## [Unreleased] - 2024-08-17
+## [0.0.1] - 2024-08-28
 
-Initial setup of the repository.
+* Initial setup of the repository.
+* Added ska-logo plugin
+* Added ska-prometheus plugin

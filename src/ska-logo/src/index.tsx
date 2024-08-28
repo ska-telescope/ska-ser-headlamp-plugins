@@ -18,4 +18,5 @@ function Logo(props: AppLogoProps) {
       />
   );
 }
+
 registerAppLogo(Logo);
