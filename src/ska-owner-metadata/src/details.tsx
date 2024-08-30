@@ -1,14 +1,15 @@
 import {
-  Link,
   MetadataDictGrid,
   NameValueTable,
   NameValueTableRow,
+  StatusLabel,
 } from '@kinvolk/headlamp-plugin/lib/components/common';
 import { KubeObject } from '@kinvolk/headlamp-plugin/lib/lib/k8s/cluster';
-import { Box, Tooltip, Grid, IconButton } from '@mui/material';
-import { SvgGitlab } from './icons';
 import { makeStyles } from '@material-ui/core/styles';
+import { Box, Grid, IconButton, Tooltip } from '@mui/material';
 import { Link as MUILink } from '@mui/material';
+import { SvgGitlab } from './icons';
+import { getRouteUrl } from './utils';
 
 export interface OwnershipDetailsProps {
   resource: KubeObject;
@@ -40,6 +41,21 @@ export function OwnershipDetails(props: OwnershipDetailsProps) {
   const pipelineUrl: string = resourceAnnotations['cicd.skao.int/pipelineUrl'] || null;
   const jobUrl: string = resourceAnnotations['cicd.skao.int/jobUrl'] || null;
 
+  const namespace_status: string = resourceAnnotations['manager.cicd.skao.int/status'] || null;
+  const namespace_status_timestamp: string =
+    resourceAnnotations['manager.cicd.skao.int/status_timestamp'] || null;
+  const namespace_status_finalize: string =
+    resourceAnnotations['manager.cicd.skao.int/status_finalize_at'] || null;
+
+  const namespace_status_terms = [];
+  if (namespace_status_timestamp) {
+    namespace_status_terms.push(<p>Since: {namespace_status_timestamp}</p>);
+  }
+
+  if (namespace_status_finalize) {
+    namespace_status_terms.push(<p>Finalize At: {namespace_status_finalize}</p>);
+  }
+
   const mrAssigneesDict = mrAssignees
     ? mrAssignees.split(',').reduce((acc, curr) => {
         acc[curr] = curr;
@@ -51,30 +67,44 @@ export function OwnershipDetails(props: OwnershipDetailsProps) {
 
   const mainRows = [
     {
+      name: 'Status',
+      value: namespace_status && (
+        <StatusLabel
+          status={
+            namespace_status in ['ok']
+              ? 'success'
+              : namespace_status in ['unstable', 'failing']
+              ? 'warning'
+              : 'error'
+          }
+        >
+          {namespace_status}
+        </StatusLabel>
+      ),
+      hide: !namespace_status,
+    },
+    {
+      name: <p>Status Timeframes</p>,
+      value: namespace_status_terms.length > 0 && <>{namespace_status_terms}</>,
+      hide: namespace_status_terms.length == 0,
+    },
+    {
       name: 'Project',
       value: project && (
-        <Link routeName={'project'} params={{ name: project }}>
-          {project}
-        </Link>
+        <MUILink href={getRouteUrl(`/projects/:name`, { name: project })}>{project}</MUILink>
       ),
       hide: !project,
     },
     {
       name: 'Team',
-      value: team && (
-        <Link routeName={'team'} params={{ name: team }}>
-          {team}
-        </Link>
-      ),
+      value: team && <MUILink href={getRouteUrl(`/teams/:name`, { name: team })}>{team}</MUILink>,
       hide: !team,
     },
     {
       name: <p>User</p>,
       value: author && (
         <Grid container justifyContent="space-between" alignItems="center">
-          <Link routeName={'user'} params={{ name: author }}>
-            {author}
-          </Link>
+          <MUILink href={getRouteUrl(`/users/:name`, { name: author })}>{author}</MUILink>
           <Tooltip classes={{ tooltip: styles.tooltip }} title={`${author} Gitlab profile`}>
             <IconButton href={authorUrl} aria-label="user_profile">
               <SvgGitlab />
