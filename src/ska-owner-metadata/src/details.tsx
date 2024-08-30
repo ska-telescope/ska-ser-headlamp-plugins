@@ -5,10 +5,10 @@ import {
   NameValueTableRow,
 } from '@kinvolk/headlamp-plugin/lib/components/common';
 import { KubeObject } from '@kinvolk/headlamp-plugin/lib/lib/k8s/cluster';
-import { Box, Tooltip, Grid, IconButton } from '@mui/material';
-import { SvgGitlab } from './icons';
 import { makeStyles } from '@material-ui/core/styles';
+import { Box, Grid, IconButton, Tooltip } from '@mui/material';
 import { Link as MUILink } from '@mui/material';
+import { SvgGitlab } from './icons';
 
 export interface OwnershipDetailsProps {
   resource: KubeObject;
@@ -53,7 +53,7 @@ export function OwnershipDetails(props: OwnershipDetailsProps) {
     {
       name: 'Project',
       value: project && (
-        <Link routeName={'project'} params={{ name: project }}>
+        <Link routeName={'projects'} params={{ name: project }}>
           {project}
         </Link>
       ),
@@ -62,7 +62,7 @@ export function OwnershipDetails(props: OwnershipDetailsProps) {
     {
       name: 'Team',
       value: team && (
-        <Link routeName={'team'} params={{ name: team }}>
+        <Link routeName={'teams'} params={{ name: team }}>
           {team}
         </Link>
       ),
@@ -72,7 +72,7 @@ export function OwnershipDetails(props: OwnershipDetailsProps) {
       name: <p>User</p>,
       value: author && (
         <Grid container justifyContent="space-between" alignItems="center">
-          <Link routeName={'user'} params={{ name: author }}>
+          <Link routeName={'users'} params={{ name: author }}>
             {author}
           </Link>
           <Tooltip classes={{ tooltip: styles.tooltip }} title={`${author} Gitlab profile`}>

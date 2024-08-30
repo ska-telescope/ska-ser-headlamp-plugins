@@ -29,5 +29,13 @@ js-do-lint:
 		cd -; \
 	done
 
+js-do-format:
+	@for PLUGIN in $(PLUGINS); do \
+		cd $(PLUGINS_DIR)/$$PLUGIN; \
+			npm run lint-fix; \
+			npm run format; \
+		cd -; \
+	done
+
 oci-pre-build-all:
 	@rm -rf $(PLUGINS_OUTPUT_DIR)
