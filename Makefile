@@ -39,3 +39,13 @@ js-do-format:
 
 oci-pre-build-all:
 	@rm -rf $(PLUGINS_OUTPUT_DIR)
+
+dev:
+	@for PLUGIN in $(PLUGINS); do \
+		cd $(PLUGINS_DIR)/$$PLUGIN; \
+			npm run start & \
+		cd -; \
+	done; \
+
+stop-dev:
+	kill -9 $(ps -a | grep "npm run start" | awk '{print $1}' | xargs)
