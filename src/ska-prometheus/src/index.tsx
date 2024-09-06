@@ -77,16 +77,16 @@ registerDetailsViewSectionsProcessor(function addSubheaderSection(resource, sect
     return sections;
   }
 
-  const detailsHeaderIdx = sections.findIndex(
+  const mainIdx = sections.findIndex(
     section => section.id === DefaultDetailsViewSection.MAIN_HEADER
   );
   // There is no header, so we do nothing.
-  if (detailsHeaderIdx === -1) {
+  if (mainIdx === -1) {
     return sections;
   }
 
   // We place our custom section after the header.
-  sections.splice(detailsHeaderIdx + 1, 0, {
+  sections.splice(mainIdx + 1, 0, {
     id: prometheusSection,
     section: PrometheusMetrics(resource),
   });

@@ -48,4 +48,7 @@ dev:
 	done; \
 
 stop-dev:
-	kill -9 $(ps -a | grep "npm run start" | awk '{print $1}' | xargs)
+	PROCESSES=$$(ps -a | grep "npm run start" | awk '{print $$1}' | xargs); \
+	for PROCESS in $$PROCESSES; do \
+		kill -9 $$PROCESS; \
+	done;

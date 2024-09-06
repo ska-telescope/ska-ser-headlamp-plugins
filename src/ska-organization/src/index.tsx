@@ -103,6 +103,7 @@ registerRoute({
   path: '/teams/:name',
   sidebar: 'teams',
   name: 'team',
+  exact: true,
   component: () => <OrganizationDetail filter="cicd.skao.int/team" type="Team" />,
 });
 
@@ -144,6 +145,7 @@ registerRoute({
   path: '/users/:name',
   sidebar: 'users',
   name: 'user',
+  exact: true,
   component: () => <OrganizationDetail filter="cicd.skao.int/author" type="User" />,
 });
 
@@ -202,5 +204,6 @@ registerRoute({
   path: '/projects/:name',
   sidebar: 'projects',
   name: 'project',
+  exact: true,
   component: () => <OrganizationDetail filter="cicd.skao.int/project" type="Projects" />,
 });

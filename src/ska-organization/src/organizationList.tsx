@@ -1,7 +1,6 @@
 import { K8s } from '@kinvolk/headlamp-plugin/lib';
-import { Loader, SimpleTable } from '@kinvolk/headlamp-plugin/lib/CommonComponents';
-import { Link as MUILink } from '@mui/material';
-import { getRouteUrl, stringCompare } from './utils';
+import { Link, Loader, SimpleTable } from '@kinvolk/headlamp-plugin/lib/CommonComponents';
+import { stringCompare } from './utils';
 
 export interface OrganizationListProps {
   filter: string;
@@ -36,7 +35,9 @@ export default function OrganizationList(props: OrganizationListProps) {
       label: 'Name',
       getter: element => {
         return (
-          <MUILink href={getRouteUrl(`${elementUrl}/:name`, { name: element })}>{element}</MUILink>
+          <Link routeName={`${elementUrl}/:name`} params={{ name: element }}>
+            {element}
+          </Link>
         );
       },
       sort: stringCompare,

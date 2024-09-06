@@ -1,4 +1,5 @@
 import {
+  Link,
   MetadataDictGrid,
   NameValueTable,
   NameValueTableRow,
@@ -9,7 +10,7 @@ import { makeStyles } from '@material-ui/core/styles';
 import { Box, Grid, IconButton, Tooltip } from '@mui/material';
 import { Link as MUILink } from '@mui/material';
 import { SvgGitlab } from './icons';
-import { getRouteUrl } from './utils';
+import { capitalizeFirstLetter } from './utils';
 
 export interface OwnershipDetailsProps {
   resource: KubeObject;
@@ -71,40 +72,48 @@ export function OwnershipDetails(props: OwnershipDetailsProps) {
       value: namespace_status && (
         <StatusLabel
           status={
-            namespace_status in ['ok']
+            ['ok'].indexOf(namespace_status) > -1
               ? 'success'
-              : namespace_status in ['unstable', 'failing']
+              : ['unstable', 'failing'].indexOf(namespace_status) > -1
               ? 'warning'
               : 'error'
           }
         >
-          {namespace_status}
+          {capitalizeFirstLetter(namespace_status)}
         </StatusLabel>
       ),
       hide: !namespace_status,
     },
     {
-      name: <p>Status Timeframes</p>,
+      name: <p>Status Info</p>,
       value: namespace_status_terms.length > 0 && <>{namespace_status_terms}</>,
-      hide: namespace_status_terms.length == 0,
+      hide: namespace_status_terms.length === 0,
     },
     {
       name: 'Project',
       value: project && (
-        <MUILink href={getRouteUrl(`/projects/:name`, { name: project })}>{project}</MUILink>
+        <Link routeName="/projects/:name" params={{ name: project }}>
+          {project}
+        </Link>
       ),
       hide: !project,
     },
     {
       name: 'Team',
-      value: team && <MUILink href={getRouteUrl(`/teams/:name`, { name: team })}>{team}</MUILink>,
+      value: team && (
+        <Link routeName="/teams/:name" params={{ name: team }}>
+          {team}
+        </Link>
+      ),
       hide: !team,
     },
     {
       name: <p>User</p>,
       value: author && (
         <Grid container justifyContent="space-between" alignItems="center">
-          <MUILink href={getRouteUrl(`/users/:name`, { name: author })}>{author}</MUILink>
+          <Link routeName="/users/:name" params={{ name: author }}>
+            {author}
+          </Link>
           <Tooltip classes={{ tooltip: styles.tooltip }} title={`${author} Gitlab profile`}>
             <IconButton href={authorUrl} aria-label="user_profile">
               <SvgGitlab />
