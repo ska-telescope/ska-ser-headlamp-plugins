@@ -4,8 +4,14 @@ import {
   SimpleTable,
   StatusLabel,
 } from '@kinvolk/headlamp-plugin/lib/CommonComponents';
+import { amber, green, orange } from '@mui/material/colors';
 import { useEffect, useState } from 'react';
-import { fetchHelmReleases, HelmReleaseData } from './request';
+import {
+  fetchHelmReleases,
+  HelmReleaseData,
+  HelmReleaseDependency,
+  isCARProxyInstalled,
+} from './request';
 import { capitalizeFirstLetter, stringCompare } from './utils';
 
 export interface HelmReleaseProps {
@@ -17,6 +23,8 @@ import { Tooltip } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core';
 import { Chip } from '@mui/material';
 import { styled } from '@mui/system';
+import { SvgDanger } from './icons';
+import { CarProxy } from './nexus';
 
 const PaddedChip = styled(Chip)({
   paddingTop: '2px',
@@ -29,21 +37,65 @@ const useStyles = makeStyles({
   },
 });
 
+function getReleaseTooltip(dependency: HelmReleaseDependency) {
+  if (!dependency.error && !dependency.hasVersionInfo) {
+    if (dependency.repository.startsWith('file://')) {
+      return (
+        <>
+          {dependency.repository}
+          <br />* Dependency local to the installed chart
+        </>
+      );
+    }
+
+    return '* ERROR: Unable to fetch chart information';
+  }
+
+  return dependency.error ? (
+    <>
+      {dependency.repository}
+      <br />* ERROR: {dependency.error}
+    </>
+  ) : (
+    <>
+      {dependency.repository}
+      <br />* Latest Version: {dependency.latestVersion || dependency.version}
+    </>
+  );
+}
+
 export default function HelmRelease(props: HelmReleaseProps) {
   const [releases, setHelmReleases] = useState([]);
-
+  const [carProxyInfo, setCarProxyInfo] = useState<CarProxy | null>(null);
   const styles = useStyles();
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const [isInstalled, serviceName, namespace] = await isCARProxyInstalled();
+        if (isInstalled) {
+          setCarProxyInfo({ serviceName, serviceNamespace: namespace });
+        } else {
+          setCarProxyInfo(null);
+        }
+      } catch (e) {
+        setCarProxyInfo(null);
+        return;
+      }
+    })();
+  }, [props]);
 
   useEffect(() => {
     async function getHelmReleases() {
       const data: HelmReleaseData[] = await fetchHelmReleases(
-        props.namespace.jsonData.metadata.name
+        props.namespace.jsonData.metadata.name,
+        carProxyInfo
       );
       setHelmReleases(data);
     }
 
     getHelmReleases();
-  }, [props]);
+  }, [props, carProxyInfo]);
 
   const defaultColumns = [
     {
@@ -88,7 +140,7 @@ export default function HelmRelease(props: HelmReleaseProps) {
                     <strong>Chart</strong>: {element.chartVersion}
                   </span>
                 }
-                variant="outlined"
+                size="small"
               />
             </Grid>
             <Grid item>
@@ -121,29 +173,37 @@ export default function HelmRelease(props: HelmReleaseProps) {
                 <Grid container direction="row" alignItems="start" spacing={1} columns={2}>
                   <Tooltip
                     classes={{ tooltip: styles.tooltip }}
-                    title={
-                      dependency.latestVersion
-                        ? `${dependency.repository}\nLatest Version: ${dependency.latestVersion}`
-                        : dependency.repository
-                    }
+                    title={getReleaseTooltip(dependency)}
                   >
                     <Grid item>
                       <PaddedChip
+                        icon={dependency.error ? <SvgDanger></SvgDanger> : null}
                         label={
                           <>
                             {dependency.name} <strong>{dependency.version}</strong>
                           </>
                         }
-                        variant="outlined"
                         size="small"
-                        color={dependency.latestVersion ? 'warning' : 'success'}
+                        sx={
+                          dependency.error || dependency.hasVersionInfo
+                            ? dependency.error
+                              ? { backgroundColor: orange[700] }
+                              : dependency.latestVersion
+                              ? { backgroundColor: amber[600] }
+                              : { backgroundColor: green[500] }
+                            : null
+                        }
                       />
                     </Grid>
                   </Tooltip>
                   {dependency.latestVersion && (
                     <Grid item>
                       <PaddedChip
-                        label={<strong>{dependency.latestVersion} available!</strong>}
+                        label={
+                          <>
+                            <strong>{dependency.latestVersion}</strong> available!
+                          </>
+                        }
                         variant="outlined"
                         size="small"
                         color="success"
