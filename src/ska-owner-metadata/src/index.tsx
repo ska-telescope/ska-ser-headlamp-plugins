@@ -15,16 +15,16 @@ registerDetailsViewSectionsProcessor(function addSubheaderSection(resource, sect
     return sections;
   }
 
-  const detailsHeaderIdx = sections.findIndex(
+  const metadataIdx = sections.findIndex(
     section => section.id === DefaultDetailsViewSection.METADATA
   );
   // There is no header, so we do nothing.
-  if (detailsHeaderIdx === -1) {
+  if (metadataIdx === -1) {
     return sections;
   }
 
   // We place our custom section after the header.
-  sections.splice(detailsHeaderIdx + 1, 0, {
+  sections.splice(metadataIdx + 1, 0, {
     id: ownerMetadataSection,
     section: OwnerDetails(resource),
   });

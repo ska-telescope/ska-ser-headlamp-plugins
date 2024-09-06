@@ -21,3 +21,7 @@ export function getRouteUrl(routePath: string, params: RouteURLProps = {}) {
 
   return generatePath(`#/c/:cluster${routePath}`, fullParams);
 }
+
+export function capitalizeFirstLetter(string) {
+  return string.charAt(0).toUpperCase() + string.slice(1);
+}

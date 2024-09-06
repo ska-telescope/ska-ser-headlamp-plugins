@@ -9,7 +9,7 @@ import { makeStyles } from '@material-ui/core/styles';
 import { Box, Grid, IconButton, Tooltip } from '@mui/material';
 import { Link as MUILink } from '@mui/material';
 import { SvgGitlab } from './icons';
-import { getRouteUrl } from './utils';
+import { capitalizeFirstLetter, getRouteUrl } from './utils';
 
 export interface OwnershipDetailsProps {
   resource: KubeObject;
@@ -71,22 +71,22 @@ export function OwnershipDetails(props: OwnershipDetailsProps) {
       value: namespace_status && (
         <StatusLabel
           status={
-            namespace_status in ['ok']
+            ['ok'].indexOf(namespace_status) > -1
               ? 'success'
-              : namespace_status in ['unstable', 'failing']
+              : ['unstable', 'failing'].indexOf(namespace_status) > -1
               ? 'warning'
               : 'error'
           }
         >
-          {namespace_status}
+          {capitalizeFirstLetter(namespace_status)}
         </StatusLabel>
       ),
       hide: !namespace_status,
     },
     {
-      name: <p>Status Timeframes</p>,
+      name: <p>Status Info</p>,
       value: namespace_status_terms.length > 0 && <>{namespace_status_terms}</>,
-      hide: namespace_status_terms.length == 0,
+      hide: namespace_status_terms.length === 0,
     },
     {
       name: 'Project',
