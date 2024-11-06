@@ -15,6 +15,8 @@ ifneq ($(CI_PIPELINE_ID),)
 OCI_BUILD_ADDITIONAL_ARGS = --network=host
 endif
 
+OCI_IMAGE_BUILD_CONTEXT=$(PWD)
+
 js-do-install:
 	@for PLUGIN in $(PLUGINS); do \
 		cd $(PLUGINS_DIR)/$$PLUGIN; \

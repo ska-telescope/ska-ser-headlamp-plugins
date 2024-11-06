@@ -19,9 +19,18 @@ js-lint:
   rules:
     - when: always
 
+.image_builder_template:
+  stage: build
+  script:
+    - VERSION=$(make show-version 2>/dev/null)
+    - make oci-build CAR_OCI_REGISTRY_HOST=${CI_REGISTRY}/${CI_PROJECT_NAMESPACE}/${CI_PROJECT_NAME} OCI_IMAGE=${OCI_IMAGE} OCI_BUILD_ADDITIONAL_ARGS="--network=host --build-arg BASE_IMAGE=${CI_REGISTRY}/${CI_PROJECT_NAMESPACE}/${CI_PROJECT_NAME}/ska-ser-headlamp-plugins:${VERSION}-dev.c${CI_COMMIT_SHORT_SHA}"
+
+
 include:
-  - project: "ska-telescope/templates-repository"
-    file: "gitlab-ci/includes/oci-image.gitlab-ci.yml"
+# OCI Images
+# do a custom set of build and publish stages
+  - project: 'ska-telescope/templates-repository'
+    file: 'gitlab-ci/includes/oci-image.gitlab-ci.yml'
 
   - project: "ska-telescope/templates-repository"
     file: "gitlab-ci/includes/js-lint.gitlab-ci.yml"
@@ -34,3 +43,24 @@ include:
 
   - project: "ska-telescope/templates-repository"
     file: "gitlab-ci/includes/finaliser.gitlab-ci.yml"
+
+
+
+
+oci-image-build:
+  when: manual
+
+oci-image-publish:
+  when: manual
+
+oci-image-headlamp-plugins:
+  extends: .image_builder_template
+  variables:
+    OCI_IMAGE: ska-ser-headlamp-plugins
+
+oci-image-headlamp-local:
+  extends: .image_builder_template
+  variables:
+    OCI_IMAGE: ska-ser-headlamp-local
+  needs:
+    - oci-image-headlamp-plugins
