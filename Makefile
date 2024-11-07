@@ -12,8 +12,19 @@ PLUGINS_DIR = src
 PLUGINS_OUTPUT_DIR = dist
 PLUGINS = $(shell if [ -d $(PLUGINS_DIR) ]; then cd $(PLUGINS_DIR) > /dev/null; for name in $$(ls); do if [ -d $$name ]; then echo $$name; fi done; fi;)
 
-ifneq ($(CI_PIPELINE_ID),)
-OCI_BUILD_ADDITIONAL_ARGS = --network=host
+# Don't change this order
+OCI_IMAGES := ska-ser-headlamp-plugins ska-ser-headlamp-local
+
+VERSION ?= $(shell . $(RELEASE_SUPPORT) ; RELEASE_CONTEXT_DIR=$(RELEASE_CONTEXT_DIR) setContextHelper; CONFIG=${CONFIG} setReleaseFile; getVersion)
+
+ifeq ($(CI_PIPELINE_ID),)
+OCI_BUILD_ADDITIONAL_ARGS += --build-arg BASE_IMAGE=ska-ser-headlamp-plugins:$(VERSION)
+else
+ifeq ($(findstring registry.gitlab.com,$(CAR_OCI_REGISTRY_HOST)),registry.gitlab.com)
+OCI_BUILD_ADDITIONAL_ARGS += --build-arg BASE_IMAGE=$(CAR_OCI_REGISTRY_HOST)/ska-ser-headlamp-plugins:$(VERSION)-dev.c$(CI_COMMIT_SHORT_SHA)
+else
+OCI_BUILD_ADDITIONAL_ARGS += --build-arg BASE_IMAGE=$(CAR_OCI_REGISTRY_HOST)/ska-ser-headlamp-plugins:$(VERSION)
+endif
 endif
 
 OCI_IMAGE_BUILD_CONTEXT=$(PWD)
