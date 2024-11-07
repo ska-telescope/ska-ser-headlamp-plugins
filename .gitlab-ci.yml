@@ -8,6 +8,7 @@ default:
 
 stages:
   - lint
+  - audit
   - join-reports
   - build
   - test
@@ -19,12 +20,15 @@ js-lint:
   rules:
     - when: always
 
+js-audit:
+  rules:
+    - when: always
+
 .image_builder_template:
   stage: build
   script:
     - VERSION=$(make show-version 2>/dev/null)
     - make oci-build CAR_OCI_REGISTRY_HOST=${CI_REGISTRY}/${CI_PROJECT_NAMESPACE}/${CI_PROJECT_NAME} OCI_IMAGE=${OCI_IMAGE} OCI_BUILD_ADDITIONAL_ARGS="--network=host --build-arg BASE_IMAGE=${CI_REGISTRY}/${CI_PROJECT_NAMESPACE}/${CI_PROJECT_NAME}/ska-ser-headlamp-plugins:${VERSION}-dev.c${CI_COMMIT_SHORT_SHA}"
-
 
 include:
 # OCI Images
@@ -36,6 +40,9 @@ include:
     file: "gitlab-ci/includes/js-lint.gitlab-ci.yml"
 
   - project: "ska-telescope/templates-repository"
+    file: "gitlab-ci/includes/js-audit.gitlab-ci.yml"
+
+  - project: "ska-telescope/templates-repository"
     file: "gitlab-ci/includes/release.gitlab-ci.yml"
 
   - project: "ska-telescope/templates-repository"
@@ -44,14 +51,9 @@ include:
   - project: "ska-telescope/templates-repository"
     file: "gitlab-ci/includes/finaliser.gitlab-ci.yml"
 
-
-
-
 oci-image-build:
-  when: manual
-
-oci-image-publish:
-  when: manual
+  rules:
+    - when: never
 
 oci-image-headlamp-plugins:
   extends: .image_builder_template

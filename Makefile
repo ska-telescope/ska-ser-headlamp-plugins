@@ -1,5 +1,6 @@
 PROJECT = ska-ser-headlamp-plugins
 HELM_RELEASE ?= ska-ser-headlamp-plugins
+JS_PACKAGE_MANAGER ?= npm
 
 include .make/base.mk
 include .make/oci.mk
@@ -20,22 +21,36 @@ OCI_IMAGE_BUILD_CONTEXT=$(PWD)
 js-do-install:
 	@for PLUGIN in $(PLUGINS); do \
 		cd $(PLUGINS_DIR)/$$PLUGIN; \
-			npm install; \
+			$(JS_PACKAGE_MANAGER) install; \
 		cd -; \
 	done
 
 js-do-lint:
 	@for PLUGIN in $(PLUGINS); do \
 		cd $(PLUGINS_DIR)/$$PLUGIN; \
-			npm run lint; \
+			$(JS_PACKAGE_MANAGER) run lint; \
 		cd -; \
 	done
 
 js-do-format:
 	@for PLUGIN in $(PLUGINS); do \
 		cd $(PLUGINS_DIR)/$$PLUGIN; \
-			npm run lint-fix; \
-			npm run format; \
+			$(JS_PACKAGE_MANAGER) run lint-fix; \
+			$(JS_PACKAGE_MANAGER) run format; \
+		cd -; \
+	done
+
+js-do-audit:
+	@for PLUGIN in $(PLUGINS); do \
+		cd $(PLUGINS_DIR)/$$PLUGIN; \
+			$(JS_PACKAGE_MANAGER) audit $(JS_SWITCHES_FOR_AUDIT); \
+		cd -; \
+	done
+
+js-audit-fix:
+	@for PLUGIN in $(PLUGINS); do \
+		cd $(PLUGINS_DIR)/$$PLUGIN; \
+			$(JS_PACKAGE_MANAGER) audit fix $(JS_SWITCHES_FOR_AUDIT); \
 		cd -; \
 	done
 
