@@ -60,12 +60,12 @@ oci-pre-build-all:
 dev:
 	@for PLUGIN in $(PLUGINS); do \
 		cd $(PLUGINS_DIR)/$$PLUGIN; \
-			npm run start & \
+			$(JS_PACKAGE_MANAGER) run start & \
 		cd -; \
 	done; \
 
 stop-dev:
-	PROCESSES=$$(ps -a | grep "npm run start" | awk '{print $$1}' | xargs); \
+	@PROCESSES=$$(ps -au | egrep "node.*headlamp-plugin start" | awk '{print $$2}' | xargs); \
 	for PROCESS in $$PROCESSES; do \
 		kill -9 $$PROCESS; \
 	done;
