@@ -68,4 +68,5 @@ export const ChartEnabledKinds = [
   'ReplicaSet',
   'Job',
   'CronJob',
+  'Namespace',
 ];

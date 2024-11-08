@@ -7,6 +7,7 @@ Provided plugins:
 
   * ska-logo: Changes the web app logo to the SKAO logo. Based of an `example plugin <https://github.com/headlamp-k8s/headlamp/tree/main/plugins/examples/change-logo>`_
   * ska-prometheus: Modified `plugin <https://github.com/headlamp-k8s/plugins/tree/main/prometheus>`_ plugin that allows to connect to a configurable prometheus instance
+  * ska-owner-metadata: Display information present in CICD metadata (kubernetes resource label and annotations) with navigation
   * ska-tango - Add support to view **tango.tango-controls.org/v1** CRDs and some TANGO Database status data
 
 .. toctree::

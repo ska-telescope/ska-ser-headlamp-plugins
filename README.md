@@ -10,9 +10,12 @@ In order to give Headlamp an enriched set of business-specific information, we w
 
 Currently, the SKA Headlamp Plugins provides the following plugins:
 
-- [x] Logo: Use SKAO Logo
-- [x] Prometheus: Built-in Metrics for PODs and other resources
-- [ ] TangoControls: Support for TANGO (operator) CRDs
+- [x] ska-logo: Use SKAO Logo
+- [x] ska-prometheus: Built-in CPU, Memory, Network & Disk metrics for PODs and other resources
+- [x] ska-owner-metadata: Display CICD Metadata with navigation
+- [x] ska-organization: Custom tabs with namespace information per SKAO Team, User and Project
+- [x] ska-helm-release: Information on installed releases in a namespace
+- [ ] ska-tango: Support for TANGO (operator) CRDs
 
 ## Plugins
 
@@ -66,4 +69,9 @@ npm run start
 
 This will actively monitor changes to the plugin and deploy a built version to the local (app) plugin directory. Simply press `Ctrl+Shit+R` in the **headlamp** application to reload the plugin and test your changes.
 
-Finally, you need to configure a valid cluster, by providing a kubeconfig and a token. If you don't have a token, follow [this guide](https://headlamp.dev/docs/latest/installation/#authentication--log-in).
+Finally, you need to configure a valid cluster, by providing a kubeconfig. To do that, you shouldn't import, but rather copy the kubeconfigs. Below you find an example on how to do it for multiple kubeconfigs:
+
+```
+export KUBECONFIG=<path to kubeconfig 1>:<path to kubeconfig 2>:<path to kubeconfig n>
+kubectl config view --flatten > ~/.config/Headlamp/kubeconfigs/config
+```

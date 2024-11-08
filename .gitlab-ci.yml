@@ -8,6 +8,7 @@ default:
 
 stages:
   - lint
+  - audit
   - join-reports
   - build
   - test
@@ -19,12 +20,21 @@ js-lint:
   rules:
     - when: always
 
+js-audit:
+  rules:
+    - when: always
+
 include:
-  - project: "ska-telescope/templates-repository"
-    file: "gitlab-ci/includes/oci-image.gitlab-ci.yml"
+# OCI Images
+# do a custom set of build and publish stages
+  - project: 'ska-telescope/templates-repository'
+    file: 'gitlab-ci/includes/oci-image.gitlab-ci.yml'
 
   - project: "ska-telescope/templates-repository"
     file: "gitlab-ci/includes/js-lint.gitlab-ci.yml"
+
+  - project: "ska-telescope/templates-repository"
+    file: "gitlab-ci/includes/js-audit.gitlab-ci.yml"
 
   - project: "ska-telescope/templates-repository"
     file: "gitlab-ci/includes/release.gitlab-ci.yml"

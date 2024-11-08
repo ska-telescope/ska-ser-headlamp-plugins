@@ -45,7 +45,6 @@ export function Chart(props: ChartProps) {
     const PROMETHEUS_METRICS_QUERY_TIME_MINUTES = Number(
       appConfig.getConfig().prometheusMetricsQueryTimeMinutes || '30'
     );
-    console.log(appConfig.getConfig());
     const queryTimeMinutes = currentTime - PROMETHEUS_METRICS_QUERY_TIME_MINUTES * 60;
 
     const fetchedMetrics: {
