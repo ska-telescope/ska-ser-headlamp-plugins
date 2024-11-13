@@ -1,10 +1,19 @@
 FROM node:21-alpine as builder
 
-RUN npm install -g @kinvolk/headlamp-plugin
+#RUN npm install -g @kinvolk/headlamp-plugin@0.10.0
 
 WORKDIR /headlamp-plugins
 
+COPY external /external
 COPY ./src /headlamp-plugins
+
+# Unwrap symlinks so that `@kinvolk/headlamp-plugin extract` works 
+RUN find /headlamp-plugins -type l | while read -r SYMLINK; do \
+        TARGET_DIR=$(readlink -f "$SYMLINK"); \
+        rm "$SYMLINK"; \
+        cp -r "$TARGET_DIR" "$SYMLINK"; \
+        echo "Unwrapped symlink at ${SYMLINK} => ${TARGET_DIR}"; \
+    done
 
 RUN PLUGINS=$(for name in $(ls); do if [ -d $name ]; then echo $name; fi done); \
     set -e; \
