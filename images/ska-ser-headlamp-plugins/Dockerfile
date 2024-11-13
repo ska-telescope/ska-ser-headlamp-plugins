@@ -1,4 +1,4 @@
-FROM node:20-alpine as builder
+FROM node:21-alpine as builder
 
 RUN npm install -g @kinvolk/headlamp-plugin
 
@@ -19,7 +19,7 @@ RUN PLUGINS=$(for name in $(ls); do if [ -d $name ]; then echo $name; fi done); 
     npx @kinvolk/headlamp-plugin extract /headlamp-plugins /dist && \
     ls -R /dist
 
-FROM node:20-alpine
+FROM node:21-alpine
 
 COPY --from=builder /dist /dist
 COPY ./scripts/install-plugins.sh /install-plugins.sh
