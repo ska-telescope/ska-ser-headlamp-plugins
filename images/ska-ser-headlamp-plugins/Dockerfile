@@ -1,6 +1,6 @@
 FROM node:21-alpine as builder
 
-#RUN npm install -g @kinvolk/headlamp-plugin@0.10.0
+RUN npm install -g @kinvolk/headlamp-plugin@0.10.0
 
 WORKDIR /headlamp-plugins
 
