@@ -15,6 +15,7 @@ Currently, the SKA Headlamp Plugins provides the following plugins:
 - [x] ska-owner-metadata: Display CICD Metadata with navigation
 - [x] ska-organization: Custom tabs with namespace information per SKAO Team, User and Project
 - [x] ska-helm-release: Information on installed releases in a namespace
+- [x] flux: Information on FluxCD resources (BETA)
 - [ ] ska-tango: Support for TANGO (operator) CRDs
 
 ## Plugins
@@ -52,7 +53,7 @@ git submodule update --init --recursive
 To test locally the plugins, start by installing the Headlamp app locally:
 
 ```
-VERSION=0.25.0 # Go to https://github.com/headlamp-k8s/headlamp/releases, get latest release
+VERSION=0.26.0 # Go to https://github.com/headlamp-k8s/headlamp/releases, get latest release
 wget https://github.com/headlamp-k8s/headlamp/releases/download/v$VERSION/Headlamp-$VERSION-linux-x64.tar.gz -o headlamp
 mkdir headlamp
 tar xf headlamp.tar.gz -C headlamp --strip-components 1
