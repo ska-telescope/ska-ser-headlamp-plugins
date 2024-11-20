@@ -16,7 +16,7 @@ Currently, the SKA Headlamp Plugins provides the following plugins:
 - [x] ska-organization: Custom tabs with namespace information per SKAO Team, User and Project
 - [x] ska-helm-release: Information on installed releases in a namespace
 - [x] flux: Information on FluxCD resources (BETA)
-- [ ] ska-tango: Support for TANGO (operator) CRDs
+- [x] ska-tango: Support SKA Tango Operator CRDs - DeviceServer and DatabaseDS - with TANGO DB information
 
 ## Plugins
 

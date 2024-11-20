@@ -11,6 +11,7 @@ Provided plugins:
   * ska-organization: Adds information about the namespaces belonging to the different Teams, Users and Projects
   * ska-helm-release: Shows Helm releases in namespaces, along with its sub-charts. For the sub-charts, looks for their latest versions in CAR.
   * flux: `FluxCD <https://github.com/headlamp-k8s/plugins/tree/main/flux>`_ plugin
+  * ska-tango: Support SKA Tango Operator CRDs - DeviceServer and DatabaseDS - with TANGO DB information
 
 .. toctree::
   :maxdepth: 1

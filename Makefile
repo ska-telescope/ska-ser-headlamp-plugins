@@ -45,10 +45,12 @@ js-do-lint:
 
 js-do-format:
 	@for PLUGIN in $(PLUGINS); do \
-		cd $(PLUGINS_DIR)/$$PLUGIN; \
-			$(JS_PACKAGE_MANAGER) run lint-fix; \
-			$(JS_PACKAGE_MANAGER) run format; \
-		cd -; \
+		if [ $$PLUGIN != "flux" ]; then
+			cd $(PLUGINS_DIR)/$$PLUGIN; \
+				$(JS_PACKAGE_MANAGER) run lint-fix; \
+				$(JS_PACKAGE_MANAGER) run format; \
+			cd -; \
+		fi; \
 	done
 
 js-do-audit:
@@ -69,6 +71,7 @@ oci-pre-build-all:
 	@rm -rf $(PLUGINS_OUTPUT_DIR)
 
 dev:
+	@$(MAKE) stop-dev || true
 	@for PLUGIN in $(PLUGINS); do \
 		cd $(PLUGINS_DIR)/$$PLUGIN; \
 			$(JS_PACKAGE_MANAGER) run start & \

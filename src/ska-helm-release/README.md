@@ -1,3 +1,3 @@
-# SKA Owner Metadata
+# SKA Helm Release
 
-This plugins adds a banner with Helm release information. For each sub-chart it tries to check with CAR if there is a newer version.
+This plugins Helm release information to namespaces and gets the latest version of the SKAO charts from CAR.
