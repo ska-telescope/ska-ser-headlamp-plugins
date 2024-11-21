@@ -1,4 +1,4 @@
-import { ApiProxy } from "@kinvolk/headlamp-plugin/lib";
+import { ApiProxy } from '@kinvolk/headlamp-plugin/lib';
 
 const request = ApiProxy.request;
 

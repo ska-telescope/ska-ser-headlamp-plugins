@@ -38,14 +38,16 @@ js-do-install:
 
 js-do-lint:
 	@for PLUGIN in $(PLUGINS); do \
-		cd $(PLUGINS_DIR)/$$PLUGIN; \
-			$(JS_PACKAGE_MANAGER) run lint; \
-		cd -; \
+		if [ "$$PLUGIN" != "flux" ]; then \
+			cd $(PLUGINS_DIR)/$$PLUGIN; \
+				$(JS_PACKAGE_MANAGER) run lint; \
+			cd -; \
+		fi; \
 	done
 
 js-do-format:
 	@for PLUGIN in $(PLUGINS); do \
-		if [ $$PLUGIN != "flux" ]; then
+		if [ "$$PLUGIN" != "flux" ]; then \
 			cd $(PLUGINS_DIR)/$$PLUGIN; \
 				$(JS_PACKAGE_MANAGER) run lint-fix; \
 				$(JS_PACKAGE_MANAGER) run format; \

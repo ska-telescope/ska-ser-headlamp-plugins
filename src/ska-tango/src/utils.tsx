@@ -1,5 +1,5 @@
-import React from "react";
-import { KubeCRD } from "@kinvolk/headlamp-plugin/lib/lib/k8s/crd";
+import { KubeCRD } from '@kinvolk/headlamp-plugin/lib/lib/k8s/crd';
+import React from 'react';
 
 export function stringCompare(a: string, b: string) {
   return a?.toLowerCase() > b?.toLowerCase() ? 1 : -1;
