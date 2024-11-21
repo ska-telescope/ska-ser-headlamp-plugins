@@ -101,7 +101,11 @@ export function DeviceServersList(props: DeviceServersListProps) {
         <Table
           data={resource}
           defaultSortingColumn={1}
-          filterFunction={useFilterFunc()}
+          filterFunction={
+            props.namespace
+              ? ns => (ns.jsonData.metadata?.namespace || null) === props.namespace.metadata.name
+              : useFilterFunc()
+          }
           columns={props.namespace ? namespacedColumns : generalColumns}
         />
       ) : (
