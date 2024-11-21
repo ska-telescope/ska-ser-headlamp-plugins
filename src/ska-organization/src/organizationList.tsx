@@ -75,6 +75,27 @@ export default function OrganizationList(props: OrganizationListProps) {
       sort: true,
     },
     {
+      label: 'Failing Namespaces',
+      getter: element => {
+        return Array.from(
+          new Set(
+            namespaces
+              ?.filter(
+                item => (item.jsonData.metadata?.labels?.[elementFilter] || null) === element
+              )
+              .filter(
+                item =>
+                  ['unstable', 'failing', 'failed'].indexOf(
+                    item.jsonData.metadata?.annotations?.['manager.cicd.skao.int/status'] || null
+                  ) > -1
+              )
+              .map(item => item.jsonData.metadata?.name)
+          )
+        ).length;
+      },
+      sort: true,
+    },
+    {
       label: 'Pipelines',
       getter: element => {
         return Array.from(
@@ -88,6 +109,7 @@ export default function OrganizationList(props: OrganizationListProps) {
           )
         ).length;
       },
+      sort: true,
     },
   ];
 

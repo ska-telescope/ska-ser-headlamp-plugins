@@ -82,7 +82,7 @@ export function DependencyItem(props: DependencyItemProps) {
   const [latestVersionInfo, setLatestVersionInfo] = useState(dependency.latestVersionInfo);
   const styles = useStyles();
 
-  function getDepedencyIcon(depedency: HelmReleaseDependency) {
+  function getDepedencyIcon() {
     if (!latestVersionInfo) {
       return dependency.local ? <SvgLocal /> : dependency.external ? <SvgExternal /> : null;
     }
