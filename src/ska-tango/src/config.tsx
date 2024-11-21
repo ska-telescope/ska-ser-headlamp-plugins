@@ -1,12 +1,10 @@
 class AppConfig {
-  private skaTangoPingServiceLabelSelector: string =
-    "<SKA_TANGO_PING_SERVICE_LABEL_SELECTOR>";
+  private skaTangoPingServiceLabelSelector: string = '<SKA_TANGO_PING_SERVICE_LABEL_SELECTOR>';
 
   constructor() {
-    this.skaTangoPingServiceLabelSelector =
-      this.skaTangoPingServiceLabelSelector.match("<.*>")
-        ? null
-        : this.skaTangoPingServiceLabelSelector;
+    this.skaTangoPingServiceLabelSelector = this.skaTangoPingServiceLabelSelector.match('<.*>')
+      ? null
+      : this.skaTangoPingServiceLabelSelector;
   }
 
   // Function to get the configuration

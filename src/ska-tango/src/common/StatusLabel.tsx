@@ -1,5 +1,5 @@
-import { StatusLabel as HLStatusLabel } from "@kinvolk/headlamp-plugin/lib/components/common";
-import { KubeCRD } from "@kinvolk/headlamp-plugin/lib/lib/k8s/crd";
+import { StatusLabel as HLStatusLabel } from '@kinvolk/headlamp-plugin/lib/components/common';
+import { KubeCRD } from '@kinvolk/headlamp-plugin/lib/lib/k8s/crd';
 
 interface StatusLabelProps {
   item: KubeCRD;
@@ -7,9 +7,7 @@ interface StatusLabelProps {
 
 export default function StatusLabel(props: StatusLabelProps) {
   const { item } = props;
-  const ready = item?.jsonData?.status?.conditions?.find(
-    (c) => c.type === "Ready"
-  );
+  const ready = item?.jsonData?.status?.conditions?.find(c => c.type === 'Ready');
 
   if (!ready) {
     return <span>-</span>;
@@ -18,14 +16,14 @@ export default function StatusLabel(props: StatusLabelProps) {
   if (item?.jsonData?.spec?.suspend) {
     return <HLStatusLabel status="warning">Suspended</HLStatusLabel>;
   }
-  if (ready.status === "Unknown") {
+  if (ready.status === 'Unknown') {
     return <HLStatusLabel status="warning">Reconciling…</HLStatusLabel>;
   }
 
-  const isReady = ready.status === "True";
+  const isReady = ready.status === 'True';
   return (
-    <HLStatusLabel status={isReady ? "success" : "error"}>
-      {isReady ? "Ready" : "Failed"}
+    <HLStatusLabel status={isReady ? 'success' : 'error'}>
+      {isReady ? 'Ready' : 'Failed'}
     </HLStatusLabel>
   );
 }

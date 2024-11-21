@@ -1,8 +1,7 @@
 import { ApiProxy } from '@kinvolk/headlamp-plugin/lib';
 import pako from 'pako';
-import semver from 'semver';
 import appConfig from './config';
-import getLatestHelmChartReleaseFromCAR, { CarProxy } from './nexus';
+import getLatestHelmChartReleaseFromCAR, { CarProxy, ChartLatestVersionInfo } from './nexus';
 
 const request = ApiProxy.request;
 
@@ -29,9 +28,10 @@ export interface HelmReleaseDependency {
   version: string;
   repository: string;
   enabled: boolean;
-  error: string | null;
-  latestVersion: string | null;
-  hasVersionInfo: boolean;
+  indirect: boolean;
+  local: boolean;
+  external: boolean;
+  latestVersionInfo?: ChartLatestVersionInfo;
 }
 
 export interface HelmReleaseData {
@@ -39,9 +39,11 @@ export interface HelmReleaseData {
   version: string;
   status: string;
   timestamp: string;
+  updatedTimestamp: string;
   chart: string;
   chartVersion: string;
-  chartDependencies: string;
+  appVersion: string;
+  dependencies?: HelmReleaseDependency[];
 }
 
 function decodeReleaseData(encodedData: string) {
@@ -57,26 +59,19 @@ function decodeReleaseData(encodedData: string) {
   }
 }
 
-function compareVersions(versionA: string, versionB: string): string | null {
-  if (!versionB || semver.gte(versionA, versionB)) {
-    return null;
-  }
-
-  return versionB;
-}
-
-async function getLatestVersion(repository: string, chart: string, carProxy: CarProxy) {
+export async function fetchLatestVersionInfo(
+  repository: string,
+  chart: string,
+  carProxy: CarProxy
+) {
   if (!repository || !repository.startsWith('https://artefact.skao.int')) {
-    return [null, null];
+    return null;
   }
 
   return await getLatestHelmChartReleaseFromCAR(repository.split('/').pop(), chart, carProxy);
 }
 
-export async function fetchHelmReleases(
-  namespace: string,
-  carProxy: CarProxy | null
-): Promise<HelmReleaseData[]> {
+export async function fetchHelmReleases(namespace: string): Promise<HelmReleaseData[]> {
   const params = new URLSearchParams();
   params.append('labelSelector', 'owner=helm');
   const response = await request(`/api/v1/namespaces/${namespace}/secrets?${params.toString()}`, {
@@ -89,51 +84,58 @@ export async function fetchHelmReleases(
     const filteredSecretList = secretList.items.filter(
       item => ['deployed', 'failed'].indexOf(item.metadata.labels.status) > -1
     );
-    const releaseData: any[] = filteredSecretList.map(item => decodeReleaseData(item.data.release));
-    const latestVersions: any[] = await Promise.all(
-      releaseData.map(async item => {
-        if (!item.chart.metadata.dependencies || !carProxy) {
-          return {};
+
+    return filteredSecretList.map(item => {
+      const decodedData = decodeReleaseData(item.data.release);
+      const metadataDeps = decodedData.chart.metadata.dependencies || [];
+      const lockDeps = decodedData.chart.lock.dependencies || [];
+      const depMap = new Map<string, HelmReleaseDependency>();
+
+      metadataDeps.forEach(metaDep => {
+        let depToAdd: HelmReleaseDependency = metaDep;
+        if (metaDep.alias) {
+          const matchingLockDep = lockDeps.find(
+            lockDep =>
+              lockDep.version === metaDep.version &&
+              lockDep.repository === metaDep.repository &&
+              lockDep.name.includes(metaDep.name)
+          );
+
+          if (matchingLockDep) {
+            depToAdd = matchingLockDep;
+          }
         }
 
-        return item.chart.metadata.dependencies.reduce(async (accPromise, dep) => {
-          const acc = await accPromise;
-          const [error, latestVersion] = await getLatestVersion(dep.repository, dep.name, carProxy);
-          acc[dep.name] = {
-            error: error,
-            latestVersion: compareVersions(dep.version, latestVersion),
-            hasVersionInfo: latestVersion !== undefined && latestVersion !== null,
-          };
-          return acc;
-        }, Promise.resolve({} as Record<string, string>));
-      })
-    );
+        const key = `${depToAdd.repository || ''}:${depToAdd.name}:${depToAdd.version}`;
+        depToAdd.local = depToAdd.repository.startsWith('file://');
+        depToAdd.external =
+          !depToAdd.repository.startsWith('https://artefact.skao.int') &&
+          !depToAdd.repository.startsWith('https://harbor.skao.int');
+        depMap.set(key, depToAdd);
+      });
 
-    return filteredSecretList.map(
-      (item, idx) =>
-        ({
-          name: item.metadata.labels.name,
-          version: item.metadata.labels.version,
-          status: item.metadata.labels.status,
-          timestamp: item.metadata.creationTimestamp,
-          chart: releaseData[idx].chart.metadata.name,
-          chartVersion: releaseData[idx].chart.metadata.version,
-          appVersion: releaseData[idx].chart.metadata.appVersion,
-          chartDependencies: releaseData[idx].chart.metadata.dependencies?.map(
-            dep =>
-              ({
-                name: dep.name,
-                version: dep.version,
-                repository: dep.repository,
-                enabled: dep.enabled,
-                ...latestVersions[idx][dep.name],
-              } as HelmReleaseDependency)
-          ),
-        } as HelmReleaseData)
-    );
+      lockDeps.forEach(lockDep => {
+        const key = `${lockDep.repository || ''}:${lockDep.name}:${lockDep.version}`;
+        if (!depMap.has(key)) {
+          const indirectDep = { ...lockDep, indirect: true };
+          depMap.set(key, indirectDep);
+        }
+      });
+
+      return {
+        name: item.metadata.labels.name,
+        version: item.metadata.labels.version,
+        status: item.metadata.labels.status,
+        timestamp: decodedData.info.first_deployed,
+        updatedTimestamp: decodedData.info.last_deployed || decodedData.info.first_deployed,
+        chart: decodedData.chart.metadata.name,
+        chartVersion: decodedData.chart.metadata.version,
+        appVersion: decodedData.chart.metadata.appVersion,
+        dependencies: Array.from(depMap.values()),
+      } as HelmReleaseData;
+    });
   } else {
     console.error(response.statusText);
-
     return [];
   }
 }

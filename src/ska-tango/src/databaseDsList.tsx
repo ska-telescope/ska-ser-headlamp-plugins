@@ -1,15 +1,15 @@
-import { K8s } from "@kinvolk/headlamp-plugin/lib";
+import { K8s } from '@kinvolk/headlamp-plugin/lib';
 import {
   Loader,
   SectionBox,
   SectionFilterHeader,
-} from "@kinvolk/headlamp-plugin/lib/components/common";
-import { useFilterFunc } from "@kinvolk/headlamp-plugin/lib/Utils";
-import MuiLink from "@mui/material/Link";
-import React, { useEffect, useState } from "react";
-import Table from "./common/Table";
-import { isTangoPingInstalled } from "./request";
-import { KubeCRD } from "@kinvolk/headlamp-plugin/lib/lib/k8s/crd";
+} from '@kinvolk/headlamp-plugin/lib/components/common';
+import { KubeCRD } from '@kinvolk/headlamp-plugin/lib/lib/k8s/crd';
+import { useFilterFunc } from '@kinvolk/headlamp-plugin/lib/Utils';
+import MuiLink from '@mui/material/Link';
+import React, { useEffect, useState } from 'react';
+import Table from './common/Table';
+import { isTangoPingInstalled } from './request';
 
 export default function DatabaseDs() {
   const [loading, setLoading] = useState<boolean>(true);
@@ -21,8 +21,7 @@ export default function DatabaseDs() {
   useEffect(() => {
     (async () => {
       try {
-        const [isInstalled, serviceName, namespace] =
-          await isTangoPingInstalled();
+        const [isInstalled, serviceName, namespace] = await isTangoPingInstalled();
         if (isInstalled) {
           setTangoPingInfo({ serviceName, serviceNamespace: namespace });
           setLoading(false);
@@ -42,13 +41,10 @@ export default function DatabaseDs() {
       <SectionBox>
         <h1>SKA CRDs are not installed</h1>
         <p>
-          Follow the{" "}
-          <MuiLink
-            target="_blank"
-            href="https://gitlab.com/ska-telescope/ska-tango-operator"
-          >
+          Follow the{' '}
+          <MuiLink target="_blank" href="https://gitlab.com/ska-telescope/ska-tango-operator">
             installation guide
-          </MuiLink>{" "}
+          </MuiLink>{' '}
           to install the SKA Tango Operator and its CRDs
         </p>
       </SectionBox>
@@ -60,7 +56,7 @@ export default function DatabaseDs() {
 
 export function DatabaseDsListWrapper({ namespace }) {
   const [databaseDs] = K8s.ResourceClasses.CustomResourceDefinition.useGet(
-    "databaseds.tango.tango-controls.org"
+    'databaseds.tango.tango-controls.org'
   );
 
   const databaseDsResourceClass = React.useMemo(() => {
@@ -69,10 +65,7 @@ export function DatabaseDsListWrapper({ namespace }) {
 
   return (
     <div>
-      <DatabaseDsList
-        resourceClass={databaseDsResourceClass}
-        namespace={namespace}
-      />
+      <DatabaseDsList resourceClass={databaseDsResourceClass} namespace={namespace} />
     </div>
   );
 }
@@ -93,31 +86,26 @@ export function DatabaseDsList(props: DatabaseDsListListProps) {
     [resource] = props.resourceClass.useList(queryData);
   }
 
-  const namespacedColumns = ["name", "status", "age"];
-  const generalColumns = ["name", "namespace", "status", "age"];
+  const namespacedColumns = ['name', 'status', 'age'];
+  const generalColumns = ['name', 'namespace', 'status', 'age'];
 
-  if (
-    !props ||
-    (props?.hideWithoutItems &&
-      (resource === undefined || resource?.length == 0))
-  ) {
+  if (!props || (props?.hideWithoutItems && (resource === undefined || resource?.length === 0))) {
     return <></>;
   }
 
   return (
     <SectionBox
-      title={
-        <SectionFilterHeader
-          title="Database DS"
-          noNamespaceFilter={props?.namespace}
-        />
-      }
+      title={<SectionFilterHeader title="Database DS" noNamespaceFilter={props?.namespace} />}
     >
       {props.resourceClass ? (
         <Table
           data={resource}
           defaultSortingColumn={1}
-          filterFunction={useFilterFunc()}
+          filterFunction={
+            props.namespace
+              ? ns => (ns.jsonData.metadata?.namespace || null) === props.namespace.metadata.name
+              : useFilterFunc()
+          }
           columns={props.namespace ? namespacedColumns : generalColumns}
         />
       ) : (

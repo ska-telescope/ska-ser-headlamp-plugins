@@ -4,13 +4,12 @@ import {
   Table as HTable,
   TableColumn,
   TableProps as HTableProps,
-} from "@kinvolk/headlamp-plugin/lib/components/common";
-import { KubeObject } from "@kinvolk/headlamp-plugin/lib/lib/k8s/cluster";
-import { KubeCRD } from "@kinvolk/headlamp-plugin/lib/lib/k8s/crd";
-import React from "react";
-import StatusLabel from "./StatusLabel";
+} from '@kinvolk/headlamp-plugin/lib/components/common';
+import { KubeObject } from '@kinvolk/headlamp-plugin/lib/lib/k8s/cluster';
+import React from 'react';
+import StatusLabel from './StatusLabel';
 
-type CommonColumnType = "namespace" | "name" | "age" | "status";
+type CommonColumnType = 'namespace' | 'name' | 'age' | 'status';
 
 interface TableCol {
   header: string;
@@ -20,11 +19,11 @@ interface TableCol {
 }
 
 interface NameColumn extends Partial<TableCol> {
-  extends: "name";
+  extends: 'name';
   routeName?: string;
 }
 
-export interface TableProps extends Omit<HTableProps, "columns"> {
+export interface TableProps extends Omit<HTableProps, 'columns'> {
   columns: (TableCol | CommonColumnType | NameColumn | TableColumn)[];
 }
 
@@ -35,12 +34,15 @@ function prepareNameColumn(colProps: Partial<NameColumn> = {}): TableCol {
   delete genericProps.extends;
 
   return {
-    header: "Name",
-    accessorKey: "metadata.name",
+    header: 'Name',
+    accessorKey: 'metadata.name',
     Cell: ({ row: { original: item } }) => (
       <Link
         routeName={
-          routeName ?? `/tango/${item.kind.toLowerCase()}s/:namespace/:name`
+          routeName ??
+          `/tango/${item.kind.toLowerCase()}${
+            item.kind.toLowerCase() === 'databaseds' ? '' : 's'
+          }/:namespace/:name`
         }
         params={{
           name: item.metadata.name,
@@ -58,15 +60,15 @@ export function Table(props: TableProps) {
   const { columns, data, ...otherProps } = props;
 
   const processedColumns = React.useMemo(() => {
-    return columns.map((column) => {
-      if (typeof column === "string") {
+    return columns.map(column => {
+      if (typeof column === 'string') {
         switch (column) {
-          case "name":
+          case 'name':
             return prepareNameColumn();
-          case "namespace":
+          case 'namespace':
             return {
-              header: "Namespace",
-              accessorKey: "metadata.namespace",
+              header: 'Namespace',
+              accessorKey: 'metadata.namespace',
               Cell: ({ row: { original: item } }) => (
                 <Link
                   routeName="namespace"
@@ -78,29 +80,26 @@ export function Table(props: TableProps) {
                 </Link>
               ),
             };
-          case "age":
+          case 'age':
             return {
-              id: "age",
-              header: "Age",
-              gridTemplate: "min-content",
+              id: 'age',
+              header: 'Age',
+              gridTemplate: 'min-content',
               accessorFn: (item: KubeObject) =>
                 -new Date(item.metadata.creationTimestamp).getTime(),
               enableColumnFilter: false,
               muiTableBodyCellProps: {
-                align: "right",
+                align: 'right',
               },
               Cell: ({ row }) =>
                 row.original && (
-                  <DateLabel
-                    date={row.original.metadata.creationTimestamp}
-                    format="mini"
-                  />
+                  <DateLabel date={row.original.metadata.creationTimestamp} format="mini" />
                 ),
             };
-          case "status":
+          case 'status':
             return {
-              header: "Status",
-              accessorFn: (item) => {
+              header: 'Status',
+              accessorFn: item => {
                 return <StatusLabel item={item} />;
               },
             };
@@ -109,7 +108,7 @@ export function Table(props: TableProps) {
         }
       }
 
-      if ((column as NameColumn).extends === "name") {
+      if ((column as NameColumn).extends === 'name') {
         return prepareNameColumn(column as NameColumn);
       }
 
@@ -117,14 +116,7 @@ export function Table(props: TableProps) {
     });
   }, [columns]);
 
-  return (
-    <HTable
-      data={data}
-      loading={data === null}
-      {...otherProps}
-      columns={processedColumns}
-    />
-  );
+  return <HTable data={data} loading={data === null} {...otherProps} columns={processedColumns} />;
 }
 
 export default Table;
