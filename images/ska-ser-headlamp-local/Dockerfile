@@ -21,6 +21,9 @@ RUN addgroup -g 1000 -S headlamp && adduser -u 1000 -G headlamp -S headlamp
 # Ensure headlamp owns the /headlamp directory
 RUN chown -R headlamp:headlamp /headlamp
 
+# 
+RUN chmod -R g=u /headlamp
+
 # Install curl for easier debugging if needed
 RUN apk add --no-cache curl
 
