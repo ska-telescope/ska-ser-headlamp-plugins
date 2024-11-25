@@ -74,6 +74,7 @@ interface DeviceServersListProps {
   resourceClass: KubeCRD;
   namespace?: K8s.ResourceClasses.Namespace;
   hideWithoutItems?: boolean;
+  paddingTop?: number;
 }
 
 export function DeviceServersList(props: DeviceServersListProps) {
