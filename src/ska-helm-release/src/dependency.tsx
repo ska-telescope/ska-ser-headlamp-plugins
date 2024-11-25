@@ -11,8 +11,7 @@ import { fetchLatestVersionInfo, HelmReleaseDependency } from './request'; // Yo
 import { compareVersions } from './utils';
 
 const PaddedChip = styled(Chip)({
-  paddingTop: '2px',
-  paddingBottom: '2px',
+  paddingTop: '0.2rem',
 });
 
 const useStyles = makeStyles({
@@ -37,8 +36,8 @@ export interface DependencyItemProps {
 }
 
 function getReleaseTooltip(dependency: HelmReleaseDependency) {
-  const latestVersionInfo = dependency.latestVersionInfo;
-  if (!latestVersionInfo && !dependency) {
+  const latestVersionInfo = dependency?.latestVersionInfo || null;
+  if (!latestVersionInfo && !!dependency) {
     return '* ERROR: Unable to fetch chart information';
   }
 
@@ -79,7 +78,7 @@ function getReleaseTooltip(dependency: HelmReleaseDependency) {
 
 export function DependencyItem(props: DependencyItemProps) {
   const dependency = props.dependency;
-  const [latestVersionInfo, setLatestVersionInfo] = useState(dependency.latestVersionInfo);
+  const [latestVersionInfo, setLatestVersionInfo] = useState(dependency?.latestVersionInfo || null);
   const styles = useStyles();
 
   function getDepedencyIcon() {
@@ -143,7 +142,7 @@ export function DependencyItem(props: DependencyItemProps) {
       </Tooltip>
       {!dependency.local && !dependency.external && !latestVersionInfo && (
         <Grid item>
-          <Loader size={'0.5em'} noContainer />
+          <Loader size={'0.5rem'} noContainer />
         </Grid>
       )}
       {latestVersionInfo &&

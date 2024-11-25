@@ -1,60 +1,50 @@
 import { ApiProxy } from '@kinvolk/headlamp-plugin/lib';
+import { Link } from '@kinvolk/headlamp-plugin/lib/components/common';
 import React from 'react';
-import {
-  Link,
-} from '@kinvolk/headlamp-plugin/lib/components/common';
-
 
 interface RequestStatefulSetProps {
-	labelSelector: string;
+  labelSelector: string;
   namespace: string;
-	name: string;
+  name: string;
 }
 
 export default function StatefulSetFind(props: RequestStatefulSetProps) {
-    const request = ApiProxy.request;
-    const queryParams = new URLSearchParams();
-    queryParams.append('labelSelector', props.labelSelector);
+  const request = ApiProxy.request;
+  const queryParams = new URLSearchParams();
+  queryParams.append('labelSelector', props.labelSelector);
 
-    const [statefulsetName, setStatefulsetName] = React.useState('Loading...');
+  const [statefulsetName, setStatefulsetName] = React.useState('Loading...');
 
-    React.useEffect(() => {
-      
-      request(
-        `/apis/apps/v1/namespaces/${
-          props.namespace
-        }/statefulsets?${queryParams.toString()}`,
-        {
-          method: 'GET',
+  React.useEffect(() => {
+    request(`/apis/apps/v1/namespaces/${props.namespace}/statefulsets?${queryParams.toString()}`, {
+      method: 'GET',
+    })
+      .then(response => {
+        if (response.items && response.items.length > 0) {
+          setStatefulsetName(response.items[0].metadata.name);
+        } else {
+          setStatefulsetName('Null');
         }
-      )
-        .then(response => {
-          if (response.items && response.items.length > 0) {
-            setStatefulsetName(response.items[0].metadata.name);
-          } else {
-            setStatefulsetName('Null');
-          }
-        })
-        .catch(error => {
-          console.error('Error fetching StatefulSet:', error);
-          setStatefulsetName('Error');
-        });
-    }, [props.name, props.namespace]);
+      })
+      .catch(error => {
+        console.error('Error fetching StatefulSet:', error);
+        setStatefulsetName('Error');
+      });
+  }, [props.name, props.namespace]);
 
-		if (statefulsetName === 'Null') {
-			return <span>No StatefulSet found</span>;
-		}
+  if (statefulsetName === 'Null') {
+    return <span>No StatefulSet found</span>;
+  }
 
-    return (
-      <Link
-        routeName="statefulset"
-        params={{
-          name: statefulsetName,
-          namespace: props.namespace,
-        }}
-      >
-        {statefulsetName}
-      </Link>
-    );
-
+  return (
+    <Link
+      routeName="statefulset"
+      params={{
+        name: statefulsetName,
+        namespace: props.namespace,
+      }}
+    >
+      {statefulsetName}
+    </Link>
+  );
 }

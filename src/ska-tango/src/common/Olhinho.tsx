@@ -1,58 +1,86 @@
-import React, { useState } from 'react';
-import { ButtonStyle, ActionButton } from '@kinvolk/headlamp-plugin/lib/components/common';
-import Dialog from '@mui/material/Dialog';
-import DialogTitle from '@mui/material/DialogTitle';
-import DialogContent from '@mui/material/DialogContent';
-import DialogActions from '@mui/material/DialogActions';
+import {
+  ActionButton,
+  ButtonStyle,
+  Dialog,
+  DialogProps as HeadlampDialogProps,
+} from '@kinvolk/headlamp-plugin/lib/components/common';
+import { KubeObject } from '@kinvolk/headlamp-plugin/lib/lib/k8s/KubeObject';
+import { DialogActions } from '@mui/material';
+import { DialogContent } from '@mui/material';
 import Button from '@mui/material/Button';
+import { Dispatch, SetStateAction, useState } from 'react';
 import ReactJson from 'react-json-view';
 
-export interface ViewButtonProps {
-  /** The JSON data to view */
-  jsonData: object;
-  /** Style of the button */
+export interface DeviceServerConfigActionProps extends HeadlampDialogProps {
+  resource: KubeObject;
   buttonStyle?: ButtonStyle;
 }
 
-const ViewButton: React.FC<ViewButtonProps> = ({
-  jsonData,
-  buttonStyle = 'menu',
-}) => {
-  const [open, setOpen] = useState(false);
+export interface DeviceServerConfigProps extends DeviceServerConfigActionProps {
+  open: boolean;
+  setOpen: Dispatch<SetStateAction<boolean>>;
+  title?: string;
+}
 
-  const handleOpen = () => setOpen(true);
-  const handleClose = () => setOpen(false);
+export function DeviceServerConfigAction(props: DeviceServerConfigActionProps) {
+  const { buttonStyle } = props;
+  const [open, setOpen] = useState(false);
 
   return (
     <>
       <ActionButton
         description=""
-        buttonStyle={buttonStyle}
-        onClick={handleOpen}
+        buttonStyle={buttonStyle || 'menu'}
+        onClick={() => setOpen(true)}
         icon="mdi:eye"
         edge="end"
       />
-      <Dialog open={open} onClose={handleClose} fullWidth maxWidth="md">
-        <DialogTitle>JSON Viewer</DialogTitle>
-        <DialogContent>
-          <ReactJson
-            src={jsonData}
-            theme="monokai"
-            style={{ padding: '10px', borderRadius: '5px' }}
-            enableClipboard={false}
-            displayDataTypes={false}
-            displayObjectSize={false}
-            // Removed handlers to disable editing
-          />
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleClose} color="primary">
-            Close
-          </Button>
-        </DialogActions>
-      </Dialog>
+      <DeviceServerConfigView open={open} setOpen={setOpen} {...props} withFullScreen />
     </>
   );
-};
+}
 
-export default ViewButton;
+export function DeviceServerConfigView(props: DeviceServerConfigProps) {
+  const { resource, open, setOpen, title, maxWidth, ...otherProps } = props;
+  const config = JSON.parse(resource?.jsonData.spec?.config || '{}');
+  const dependsOn = resource?.jsonData.spec?.dependsOn || {};
+  const dialogTitle =
+    title || `Device Server Configuration: ${resource?.jsonData?.metadata.name || 'Unknown'}`;
+  const combinedJson = {
+    config,
+    dependsOn,
+  };
+
+  return (
+    <>
+      {open && (
+        <Dialog
+          open={open}
+          onClose={() => setOpen(false)}
+          fullWidth
+          {...otherProps}
+          title={dialogTitle}
+          scroll="paper"
+          maxWidth={maxWidth || 'lg'}
+        >
+          <DialogContent>
+            {/* REFACTOR THE VIEW TO USE @monaco-editor/react */}
+            <ReactJson
+              src={combinedJson}
+              theme="monokai"
+              style={{ padding: '10px', borderRadius: '5px' }}
+              enableClipboard={false}
+              displayDataTypes={false}
+              displayObjectSize={false}
+            />
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={() => setOpen(false)} color="primary">
+              Close
+            </Button>
+          </DialogActions>
+        </Dialog>
+      )}
+    </>
+  );
+}

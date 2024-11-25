@@ -6,9 +6,9 @@ import {
 } from '@kinvolk/headlamp-plugin/lib/components/common';
 import { KubeCRD } from '@kinvolk/headlamp-plugin/lib/lib/k8s/crd';
 import { useFilterFunc } from '@kinvolk/headlamp-plugin/lib/Utils';
-import MuiLink from '@mui/material/Link';
 import React, { useEffect, useState } from 'react';
 import Table from './common/Table';
+import TangoNotInstalled from './common/TangoNotInstalled';
 import { isTangoPingInstalled } from './request';
 
 export default function DeviceServers() {
@@ -37,18 +37,7 @@ export default function DeviceServers() {
   }, []);
 
   if (!loading && !tangoPingInfo) {
-    return (
-      <SectionBox>
-        <h1>SKA CRDs are not installed</h1>
-        <p>
-          Follow the{' '}
-          <MuiLink target="_blank" href="https://gitlab.com/ska-telescope/ska-tango-operator">
-            installation guide
-          </MuiLink>{' '}
-          to install the SKA Tango Operator and its CRDs
-        </p>
-      </SectionBox>
-    );
+    return <TangoNotInstalled />;
   }
 
   return <DeviceServersListWrapper namespace={null} />;
@@ -88,7 +77,7 @@ export function DeviceServersList(props: DeviceServersListProps) {
   }
 
   const namespacedColumns = ['name', 'statefulset', 'status', 'age', 'config'];
-  const generalColumns = ['name', 'namespace', 'status', 'age'];
+  const generalColumns = ['name', 'namespace', 'status', 'age', 'config'];
 
   if (!props || (props?.hideWithoutItems && (resource === undefined || resource?.length === 0))) {
     return <></>;

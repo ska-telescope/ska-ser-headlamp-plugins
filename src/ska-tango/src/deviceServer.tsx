@@ -1,31 +1,36 @@
-import { SectionBox } from '@kinvolk/headlamp-plugin/lib/components/common';
-import { useParams } from 'react-router-dom';
-import BackLink from './common/BackLink';
-import CustomResourceDetails from './common/CustomResourceDetails';
-import { ObjectEvents } from './common/Events';
+import { ActionButton } from '@kinvolk/headlamp-plugin/lib/components/common';
+import { useState } from 'react';
+import { DeviceServerConfigView } from './common/Olhinho';
+import TangoResourceDetailedView from './common/TangoResource';
 
 export default function DeviceServerDetailedView() {
-  const { namespace, name } = useParams<{ namespace: string; name: string }>();
-  const events = null;
-  const resource = null;
-  const statefulset = null;
-  const config = null;
+  const [showConfig, setShowConfig] = useState(false);
 
-  return (
-    <>
-      <BackLink />
-      <SectionBox title={'Device Server'}>
-        {resource && (
-          <CustomResourceDetails
-            resource={resource}
-            name={name}
-            namespace={namespace}
-            statefulset={statefulset}
-            config={config}
-          />
-        )}
-        {events && <ObjectEvents events={[]} />}
-      </SectionBox>
-    </>
-  );
+  const actions = item => {
+    return [
+      {
+        id: 'DS_CONFIG',
+        action: (
+          <>
+            <ActionButton
+              description={'Show Config'}
+              aria-label={'config'}
+              icon="mdi:eye"
+              onClick={() => {
+                setShowConfig(true);
+              }}
+            />
+            <DeviceServerConfigView
+              open={showConfig}
+              setOpen={setShowConfig}
+              resource={item}
+              withFullScreen
+            />
+          </>
+        ),
+      },
+    ];
+  };
+
+  return <TangoResourceDetailedView resourceType="deviceservers" actions={actions} />;
 }

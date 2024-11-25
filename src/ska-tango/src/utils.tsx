@@ -25,3 +25,7 @@ export function GetCustomResource(props: {
 
   return null;
 }
+
+export function getHarborUrl(image: string) {
+  return `https://harbor.skao.int/harbor/projects/2/repositories/${image}/artifacts-tab`;
+}

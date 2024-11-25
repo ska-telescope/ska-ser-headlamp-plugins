@@ -5,10 +5,11 @@ import {
   TableColumn,
   TableProps as HTableProps,
 } from '@kinvolk/headlamp-plugin/lib/components/common';
-import ViewButton from './Olhinho';
 import { KubeObject } from '@kinvolk/headlamp-plugin/lib/lib/k8s/cluster';
-import StatusLabel from './StatusLabel';
+import React from 'react';
+import { DeviceServerConfigAction } from './Olhinho';
 import StatefulSetFind from './StatefulSet';
+import StatusLabel from './StatusLabel';
 
 type CommonColumnType = 'namespace' | 'name' | 'age' | 'status';
 
@@ -101,21 +102,24 @@ export function Table(props: TableProps) {
             return {
               gridTemplate: 'min-content',
               header: 'Status',
+              accessorFn: (item: KubeObject) => item?.jsonData?.status?.state,
               Cell: ({ row: { original: item } }) => {
-                return(
-                  <StatusLabel item={item} />
-                );
-              }
+                return <StatusLabel item={item} />;
+              },
             };
           case 'devices':
-            return "<devicesReady>/<devicesTotal>";
+            return '<devicesReady>/<devicesTotal>';
           case 'statefulset':
             return {
               header: 'StatefulSet',
               Cell: ({ row: { original: item } }) => {
                 const labelSelector = 'app.kubernetes.io/instance=' + item.metadata.name;
-                return(
-                  <StatefulSetFind name={item.metadata.name} namespace={item.metadata.namespace} labelSelector={labelSelector} />
+                return (
+                  <StatefulSetFind
+                    name={item.metadata.name}
+                    namespace={item.metadata.namespace}
+                    labelSelector={labelSelector}
+                  />
                 );
               },
             };
@@ -124,15 +128,8 @@ export function Table(props: TableProps) {
               gridTemplate: 'min-content',
               header: 'Config',
               Cell: ({ row: { original: item } }) => {
-                const config = JSON.parse(item.jsonData.spec?.config);
-                const dependsOn = item.jsonData.spec?.dependsOn;
-                const combinedJson = {
-                  config,
-                  dependsOn
-                };
-                return(
-                <ViewButton jsonData={ combinedJson || {}} buttonStyle="menu" />)
-              }
+                return <DeviceServerConfigAction resource={item} maxWidth={'lg'} />;
+              },
             };
           default:
             return column;

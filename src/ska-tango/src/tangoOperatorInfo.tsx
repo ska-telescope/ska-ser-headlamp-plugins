@@ -1,6 +1,7 @@
 import { K8s } from '@kinvolk/headlamp-plugin/lib';
 import { Box, Paper } from '@mui/material';
 import { ChipLabel } from './common/ChipLabel';
+import { getHarborUrl } from './utils';
 
 function getImageVersion(deployment: K8s.ResourceClasses.Deployment[], container: string) {
   if (deployment === undefined || deployment.length === 0) {
@@ -44,16 +45,12 @@ export function TangoOperatorInfo({ crdVersion }) {
         <ChipLabel
           label={'Operator'}
           value={getImageVersion(operator, 'manager')}
-          url={
-            'https://harbor.skao.int/harbor/projects/2/repositories/ska-tango-operator/artifacts-tab'
-          }
+          url={getHarborUrl('ska-tango-operator')}
         ></ChipLabel>
         <ChipLabel
           label={'Ping'}
           value={getImageVersion(ping, null)}
-          url={
-            'https://harbor.skao.int/harbor/projects/2/repositories/ska-tango-ping/artifacts-tab'
-          }
+          url={getHarborUrl('ska-tango-ping')}
         ></ChipLabel>
       </Box>
     </Paper>
