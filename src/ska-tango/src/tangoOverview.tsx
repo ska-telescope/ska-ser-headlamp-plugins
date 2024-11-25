@@ -47,11 +47,10 @@ function TangoOverview({ crdVersion, deviceServersResourceClass, databaseDsResou
   const devServerWaiting = [];
   let devicesTotalNum = 0;
   let devicesRunningNum = 0;
-  // TODO: Address this issue in SKA Tango Operator
   (deviceServers || []).forEach(item => {
     if (item?.jsonData?.status) {
-      devicesTotalNum += (item.jsonData.status.devices || []).length;
-      devicesRunningNum += (item.jsonData.status.devicesRunning || []).length;
+      devicesTotalNum += item.jsonData.status?.devicecount || 0;
+      devicesRunningNum += item.jsonData.status?.devicereadycount || 0;
     }
 
     if (item?.jsonData?.status && item.jsonData.status.state.toLowerCase() === 'running') {

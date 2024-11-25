@@ -9,23 +9,38 @@ import { Link } from '@mui/material';
 import { Chip } from '@mui/material';
 import { styled } from '@mui/system';
 
-const PaddedChip = styled(Chip)({
-  paddingTop: '2px',
-  paddingBottom: '2px',
+export const PaddedChip = styled(Chip)({
+  paddingTop: '0.2rem',
 });
 
-function UrlWrapper({ children, url }) {
-  return url ? <Link href={url}>{children || url}</Link> : children;
+function UrlWrapper({ children, url, wrap }) {
+  const wrapChildren = url && wrap;
+  return wrapChildren ? <Link href={url}>{children || url}</Link> : children;
 }
 
-export function ChipLabel({ label, value, url }: { label: string; value: any; url?: string }) {
+export function ChipLabel({
+  label,
+  value,
+  url,
+  urlOnLabel,
+}: {
+  label: string;
+  value: any;
+  url?: string;
+  urlOnLabel?: boolean;
+}) {
+  const applyLinkOnLabel = urlOnLabel || false;
   return (
     <Box display="flex" alignItems="center">
-      <Box mr={1}>{label}:</Box>
+      <Box mr={1}>
+        <UrlWrapper url={url} wrap={applyLinkOnLabel}>
+          <span>{label}</span>
+        </UrlWrapper>
+      </Box>
       {!value ? (
-        <Loader size={'0.5em'} noContainer />
+        <Loader size={'0.5rem'} noContainer />
       ) : (
-        <UrlWrapper url={url}>
+        <UrlWrapper url={url} wrap={!applyLinkOnLabel}>
           <PaddedChip
             label={<strong>{value}</strong>}
             size="small"

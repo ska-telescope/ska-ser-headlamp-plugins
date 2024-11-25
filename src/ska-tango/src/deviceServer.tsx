@@ -1,23 +1,79 @@
-import { SectionBox } from '@kinvolk/headlamp-plugin/lib/components/common';
-import { useParams } from 'react-router-dom';
-import BackLink from './common/BackLink';
-import CustomResourceDetails from './common/CustomResourceDetails';
-import { ObjectEvents } from './common/Events';
+import { MetadataDictGrid, SectionBox } from '@kinvolk/headlamp-plugin/lib/CommonComponents';
+import { ActionButton } from '@kinvolk/headlamp-plugin/lib/components/common';
+import { useState } from 'react';
+import { DeviceServerConfigView } from './common/Olhinho';
+import TangoResourceDetailedView from './common/TangoResource';
+import DevicesList from './devicesList';
 
 export default function DeviceServerDetailedView() {
-  const { namespace, name } = useParams<{ namespace: string; name: string }>();
-  const events = null;
-  const resource = null;
+  const [showConfig, setShowConfig] = useState(false);
+
+  const extraInfo = item => {
+    const loadBalancerIP = item?.jsonData?.status?.resources?.lbs?.[0]?.ip;
+    const dependencies = (item?.jsonData?.spec?.dependsOn || []).reduce((acc, dep) => {
+      acc[dep] = dep;
+      return acc;
+    }, {});
+
+    return [
+      {
+        name: 'Dependencies',
+        value: <MetadataDictGrid showKeys={false} dict={dependencies} />,
+      },
+      loadBalancerIP
+        ? {
+            name: 'Loadbalancer IP',
+            value: loadBalancerIP,
+          }
+        : null,
+    ].filter(info => info !== null);
+  };
+
+  const actions = item => {
+    return [
+      {
+        id: 'DS_CONFIG',
+        action: (
+          <>
+            <ActionButton
+              description={'Show Config'}
+              aria-label={'config'}
+              icon="mdi:eye"
+              onClick={() => {
+                setShowConfig(true);
+              }}
+            />
+            <DeviceServerConfigView
+              open={showConfig}
+              setOpen={setShowConfig}
+              resource={item}
+              withFullScreen
+            />
+          </>
+        ),
+      },
+    ];
+  };
+
+  const extraSections = item => {
+    return [
+      {
+        id: 'devices',
+        section: (
+          <SectionBox title="Devices" textAlign="center" paddingTop={2}>
+            <DevicesList resources={item} />
+          </SectionBox>
+        ),
+      },
+    ];
+  };
 
   return (
-    <>
-      <BackLink />
-      <SectionBox title={'Device Server'}>
-        {resource && (
-          <CustomResourceDetails resource={resource} name={name} namespace={namespace} />
-        )}
-        {events && <ObjectEvents events={[]} />}
-      </SectionBox>
-    </>
+    <TangoResourceDetailedView
+      resourceType="deviceservers"
+      actions={actions}
+      extraInfo={extraInfo}
+      extraSections={extraSections}
+    />
   );
 }

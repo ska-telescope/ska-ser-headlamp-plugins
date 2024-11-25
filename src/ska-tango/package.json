@@ -34,6 +34,11 @@
     "@kinvolk/headlamp-plugin": "^0.10.0"
   },
   "dependencies": {
-    "@material-ui/core": "^4.12.4"
+    "@dagrejs/dagre": "^1.1.4",
+    "@material-ui/core": "^4.12.4",
+    "@monaco-editor/react": "^4.6.0",
+    "@xyflow/react": "^12.3.5",
+    "humanize-duration": "^3.32.1",
+    "md5": "^2.3.0"
   }
 }

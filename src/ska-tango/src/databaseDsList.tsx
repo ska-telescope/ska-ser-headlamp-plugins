@@ -6,52 +6,16 @@ import {
 } from '@kinvolk/headlamp-plugin/lib/components/common';
 import { KubeCRD } from '@kinvolk/headlamp-plugin/lib/lib/k8s/crd';
 import { useFilterFunc } from '@kinvolk/headlamp-plugin/lib/Utils';
-import MuiLink from '@mui/material/Link';
-import React, { useEffect, useState } from 'react';
+import { useMemo } from 'react';
 import Table from './common/Table';
-import { isTangoPingInstalled } from './request';
+import TangoDetectionWrapper from './tango';
 
 export default function DatabaseDs() {
-  const [loading, setLoading] = useState<boolean>(true);
-  const [tangoPingInfo, setTangoPingInfo] = useState<{
-    serviceName: string;
-    serviceNamespace: string;
-  } | null>(null);
-
-  useEffect(() => {
-    (async () => {
-      try {
-        const [isInstalled, serviceName, namespace] = await isTangoPingInstalled();
-        if (isInstalled) {
-          setTangoPingInfo({ serviceName, serviceNamespace: namespace });
-          setLoading(false);
-        } else {
-          setTangoPingInfo(null);
-          setLoading(false);
-        }
-      } catch (e) {
-        setLoading(false);
-        return;
-      }
-    })();
-  }, []);
-
-  if (!loading && !tangoPingInfo) {
-    return (
-      <SectionBox>
-        <h1>SKA CRDs are not installed</h1>
-        <p>
-          Follow the{' '}
-          <MuiLink target="_blank" href="https://gitlab.com/ska-telescope/ska-tango-operator">
-            installation guide
-          </MuiLink>{' '}
-          to install the SKA Tango Operator and its CRDs
-        </p>
-      </SectionBox>
-    );
-  }
-
-  return <DatabaseDsListWrapper namespace={null} />;
+  return (
+    <TangoDetectionWrapper omit={false}>
+      <DatabaseDsListWrapper namespace={null} />
+    </TangoDetectionWrapper>
+  );
 }
 
 export function DatabaseDsListWrapper({ namespace }) {
@@ -59,15 +23,11 @@ export function DatabaseDsListWrapper({ namespace }) {
     'databaseds.tango.tango-controls.org'
   );
 
-  const databaseDsResourceClass = React.useMemo(() => {
+  const databaseDsResourceClass = useMemo(() => {
     return databaseDs?.makeCRClass();
   }, [databaseDs]);
 
-  return (
-    <div>
-      <DatabaseDsList resourceClass={databaseDsResourceClass} namespace={namespace} />
-    </div>
-  );
+  return <DatabaseDsList resourceClass={databaseDsResourceClass} namespace={namespace} />;
 }
 
 interface DatabaseDsListListProps {
@@ -81,15 +41,36 @@ export function DatabaseDsList(props: DatabaseDsListListProps) {
     namespace: props?.namespace?.metadata.name || null,
   };
 
-  let resource = undefined;
+  let filteredDatabaseDs;
+  let databaseDs = [];
   if (props.resourceClass) {
-    [resource] = props.resourceClass.useList(queryData);
+    [databaseDs] = props.resourceClass.useList(queryData);
+    filteredDatabaseDs = databaseDs;
   }
 
-  const namespacedColumns = ['name', 'status', 'age'];
-  const generalColumns = ['name', 'namespace', 'status', 'age'];
+  // This shouldn't be needed, but useList is not filtering properly
+  if (databaseDs && props.namespace) {
+    filteredDatabaseDs = databaseDs.filter(
+      item => item.jsonData.metadata.namespace === props.namespace.metadata.name
+    );
+  }
 
-  if (!props || (props?.hideWithoutItems && (resource === undefined || resource?.length === 0))) {
+  const namespacedColumns = ['name', 'components', 'statefulset', 'dbstatefulset', 'status', 'age'];
+  const generalColumns = [
+    'name',
+    'namespace',
+    'components',
+    'statefulset',
+    'dbstatefulset',
+    'status',
+    'age',
+  ];
+
+  if (
+    !props ||
+    (props?.hideWithoutItems &&
+      (filteredDatabaseDs === undefined || filteredDatabaseDs?.length === 0))
+  ) {
     return <></>;
   }
 
@@ -99,13 +80,9 @@ export function DatabaseDsList(props: DatabaseDsListListProps) {
     >
       {props.resourceClass ? (
         <Table
-          data={resource}
+          data={filteredDatabaseDs}
           defaultSortingColumn={1}
-          filterFunction={
-            props.namespace
-              ? ns => (ns.jsonData.metadata?.namespace || null) === props.namespace.metadata.name
-              : useFilterFunc()
-          }
+          filterFunction={props.namespace ? null : useFilterFunc()}
           columns={props.namespace ? namespacedColumns : generalColumns}
         />
       ) : (

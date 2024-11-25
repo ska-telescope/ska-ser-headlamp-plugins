@@ -1,23 +1,22 @@
-import { SectionBox } from '@kinvolk/headlamp-plugin/lib/components/common';
-import { useParams } from 'react-router-dom';
-import BackLink from './common/BackLink';
-import CustomResourceDetails from './common/CustomResourceDetails';
-import { ObjectEvents } from './common/Events';
+import TangoResourceDetailedView from './common/TangoResource';
 
 export default function DatabaseDsDetailedView() {
-  const { namespace, name } = useParams<{ namespace: string; name: string }>();
-  const events = null;
-  const resource = null;
+  const extraInfo = item => {
+    const loadBalancerIP = item?.jsonData?.status?.resources?.databaseds?.lbs?.[0]?.ip;
+    return [
+      loadBalancerIP
+        ? {
+            name: 'Loadbalancer IP',
+            value: loadBalancerIP,
+          }
+        : null,
+    ].filter(info => info !== null);
+  };
 
   return (
-    <>
-      <BackLink />
-      <SectionBox title={'Database DS'}>
-        {resource && (
-          <CustomResourceDetails resource={resource} name={name} namespace={namespace} />
-        )}
-        {events && <ObjectEvents events={[]} />}
-      </SectionBox>
-    </>
+    <TangoResourceDetailedView
+      resourceType="databaseds"
+      extraInfo={extraInfo}
+    ></TangoResourceDetailedView>
   );
 }

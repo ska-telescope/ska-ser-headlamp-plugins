@@ -1,5 +1,7 @@
 import { StatusLabel as HLStatusLabel } from '@kinvolk/headlamp-plugin/lib/components/common';
 import { KubeCRD } from '@kinvolk/headlamp-plugin/lib/lib/k8s/crd';
+import Tooltip from '@mui/material/Tooltip';
+import { capitalizeFirstLetter, getDeviceServerStatus } from '../utils';
 
 interface StatusLabelProps {
   item: KubeCRD;
@@ -7,23 +9,22 @@ interface StatusLabelProps {
 
 export default function StatusLabel(props: StatusLabelProps) {
   const { item } = props;
-  const ready = item?.jsonData?.status?.conditions?.find(c => c.type === 'Ready');
+  const { status, state, details } = getDeviceServerStatus(item?.jsonData?.status);
 
-  if (!ready) {
-    return <span>-</span>;
+  if (details) {
+    return (
+      <Tooltip
+        slotProps={{ tooltip: { sx: { fontSize: '0.9em' } } }}
+        title={details || 'No additional details'}
+        arrow
+        disableInteractive={false}
+      >
+        <span style={{ display: 'inline-block' }}>
+          <HLStatusLabel status={status}>{capitalizeFirstLetter(state)}</HLStatusLabel>
+        </span>
+      </Tooltip>
+    );
   }
 
-  if (item?.jsonData?.spec?.suspend) {
-    return <HLStatusLabel status="warning">Suspended</HLStatusLabel>;
-  }
-  if (ready.status === 'Unknown') {
-    return <HLStatusLabel status="warning">Reconciling…</HLStatusLabel>;
-  }
-
-  const isReady = ready.status === 'True';
-  return (
-    <HLStatusLabel status={isReady ? 'success' : 'error'}>
-      {isReady ? 'Ready' : 'Failed'}
-    </HLStatusLabel>
-  );
+  return <HLStatusLabel status={status}>{capitalizeFirstLetter(state)}</HLStatusLabel>;
 }

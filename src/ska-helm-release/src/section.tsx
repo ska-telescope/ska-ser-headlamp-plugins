@@ -24,9 +24,8 @@ import { styled } from '@mui/system';
 import { DependencyItem } from './dependency';
 import { CarProxy } from './nexus';
 
-const PaddedChip = styled(Chip)({
-  paddingTop: '2px',
-  paddingBottom: '2px',
+export const PaddedChip = styled(Chip)({
+  paddingTop: '0.2rem',
 });
 
 export default function HelmRelease(props: HelmReleaseProps) {
@@ -145,7 +144,7 @@ export default function HelmRelease(props: HelmReleaseProps) {
     {
       label: 'Dependencies',
       getter: element => {
-        if (!element.dependencies || element.dependencies.length === 0) {
+        if (!element.dependencies) {
           return <></>;
         }
 
@@ -169,7 +168,7 @@ export default function HelmRelease(props: HelmReleaseProps) {
     {
       label: 'Indirect Dependencies',
       getter: element => {
-        if (!element.dependencies || element.dependencies.length === 0) {
+        if (!element.dependencies) {
           return <></>;
         }
 
