@@ -1,5 +1,7 @@
 import { StatusLabel as HLStatusLabel } from '@kinvolk/headlamp-plugin/lib/components/common';
 import { KubeCRD } from '@kinvolk/headlamp-plugin/lib/lib/k8s/crd';
+import Tooltip from '@mui/material/Tooltip';
+
 
 interface StatusLabelProps {
   item: KubeCRD;
@@ -7,23 +9,31 @@ interface StatusLabelProps {
 
 export default function StatusLabel(props: StatusLabelProps) {
   const { item } = props;
-  const ready = item?.jsonData?.status?.conditions?.find(c => c.type === 'Ready');
+  // const ready = item?.jsonData?.status?.conditions?.find(c => c.type === 'Ready');
+  const state = item?.jsonData?.status?.state;
 
-  if (!ready) {
-    return <span>-</span>;
+  if (state.includes('Waiting')) {
+    const waitingDetails = state.includes('Waiting') 
+    ? state.match(/\((.*?)\)/)?.[1] // Extracts the part inside parentheses
+    : null;
+    console.log(waitingDetails)
+    return (
+      <Tooltip
+        title={waitingDetails || 'No additional details'}
+        arrow
+        disableInteractive={false} // Ensure tooltip works with nested elements
+      >
+        <span style={{ display: 'inline-block' }}> {/* Wrapper ensures hover area */}
+          <HLStatusLabel status="warning">Waiting</HLStatusLabel>
+        </span>
+      </Tooltip>
+    );
   }
 
-  if (item?.jsonData?.spec?.suspend) {
-    return <HLStatusLabel status="warning">Suspended</HLStatusLabel>;
-  }
-  if (ready.status === 'Unknown') {
-    return <HLStatusLabel status="warning">Reconciling…</HLStatusLabel>;
+  if (state === "Running") {
+    return <HLStatusLabel status="success">Running</HLStatusLabel>;
   }
 
-  const isReady = ready.status === 'True';
-  return (
-    <HLStatusLabel status={isReady ? 'success' : 'error'}>
-      {isReady ? 'Ready' : 'Failed'}
-    </HLStatusLabel>
-  );
+  return <HLStatusLabel status="error">Unkown</HLStatusLabel>;
+
 }

@@ -88,7 +88,7 @@ export async function fetchHelmReleases(namespace: string): Promise<HelmReleaseD
     return filteredSecretList.map(item => {
       const decodedData = decodeReleaseData(item.data.release);
       const metadataDeps = decodedData.chart.metadata.dependencies || [];
-      const lockDeps = decodedData.chart.lock.dependencies || [];
+      const lockDeps = decodedData.chart.lock?.dependencies || [];
       const depMap = new Map<string, HelmReleaseDependency>();
 
       metadataDeps.forEach(metaDep => {

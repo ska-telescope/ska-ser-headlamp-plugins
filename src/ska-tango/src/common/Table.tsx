@@ -5,9 +5,10 @@ import {
   TableColumn,
   TableProps as HTableProps,
 } from '@kinvolk/headlamp-plugin/lib/components/common';
+import ViewButton from './Olhinho';
 import { KubeObject } from '@kinvolk/headlamp-plugin/lib/lib/k8s/cluster';
-import React from 'react';
 import StatusLabel from './StatusLabel';
+import StatefulSetFind from './StatefulSet';
 
 type CommonColumnType = 'namespace' | 'name' | 'age' | 'status';
 
@@ -98,10 +99,40 @@ export function Table(props: TableProps) {
             };
           case 'status':
             return {
+              gridTemplate: 'min-content',
               header: 'Status',
-              accessorFn: item => {
-                return <StatusLabel item={item} />;
+              Cell: ({ row: { original: item } }) => {
+                return(
+                  <StatusLabel item={item} />
+                );
+              }
+            };
+          case 'devices':
+            return "<devicesReady>/<devicesTotal>";
+          case 'statefulset':
+            return {
+              header: 'StatefulSet',
+              Cell: ({ row: { original: item } }) => {
+                const labelSelector = 'app.kubernetes.io/instance=' + item.metadata.name;
+                return(
+                  <StatefulSetFind name={item.metadata.name} namespace={item.metadata.namespace} labelSelector={labelSelector} />
+                );
               },
+            };
+          case 'config':
+            return {
+              gridTemplate: 'min-content',
+              header: 'Config',
+              Cell: ({ row: { original: item } }) => {
+                const config = JSON.parse(item.jsonData.spec?.config);
+                const dependsOn = item.jsonData.spec?.dependsOn;
+                const combinedJson = {
+                  config,
+                  dependsOn
+                };
+                return(
+                <ViewButton jsonData={ combinedJson || {}} buttonStyle="menu" />)
+              }
             };
           default:
             return column;

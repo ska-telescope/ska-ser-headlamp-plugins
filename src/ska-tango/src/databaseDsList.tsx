@@ -86,7 +86,7 @@ export function DatabaseDsList(props: DatabaseDsListListProps) {
     [resource] = props.resourceClass.useList(queryData);
   }
 
-  const namespacedColumns = ['name', 'status', 'age'];
+  const namespacedColumns = ['name', 'statefulset', 'status', 'age'];
   const generalColumns = ['name', 'namespace', 'status', 'age'];
 
   if (!props || (props?.hideWithoutItems && (resource === undefined || resource?.length === 0))) {
