@@ -1,7 +1,5 @@
 import { K8s } from '@kinvolk/headlamp-plugin/lib';
 import {
-  ActionButton,
-  AuthVisible,
   DetailsGrid,
   Link,
   Loader,
@@ -16,7 +14,7 @@ import {
 import { Grid } from '@material-ui/core';
 import { Box } from '@material-ui/core';
 import { Paper } from '@mui/material';
-import React, { ReactNode, useState } from 'react';
+import React, { ReactNode } from 'react';
 import { useParams } from 'react-router-dom';
 import { getHarborUrl } from '../utils';
 import { ChipLabel } from './ChipLabel';
@@ -144,7 +142,6 @@ export default function TangoResourceDetailedView(props: TangoResourceDetailedVi
 }
 
 function TangoResourceDetail(props: TangoResourceDetailProps) {
-  const [showLogs, setShowLogs] = useState(false);
   const [statefulSets] = K8s.ResourceClasses.StatefulSet.useList({
     namespace: props.namespace,
     labelSelector: `app.kubernetes.io/instance=${props.name}`,
@@ -215,7 +212,7 @@ function TangoResourceDetail(props: TangoResourceDetailProps) {
     },
   } as KubeObjectInterface;
 
-  const defaultExtraSections = () => {
+  const defaultExtraSections = _item => {
     return [
       {
         id: 'headlamp.tango-resource-owned-pods',
@@ -224,25 +221,8 @@ function TangoResourceDetail(props: TangoResourceDetailProps) {
     ];
   };
 
-  const defaultActions = item => {
-    return [
-      {
-        id: 'POD_LOGS',
-        action: (
-          <AuthVisible item={item} authVerb="get" subresource="log">
-            <ActionButton
-              description={'Show Logs'}
-              aria-label={'logs'}
-              icon="mdi:file-document-box-outline"
-              onClick={() => {
-                setShowLogs(true);
-              }}
-            />
-            {showLogs && <p>SHOW LOGS</p>}
-          </AuthVisible>
-        ),
-      },
-    ];
+  const defaultActions = _item => {
+    return [];
   };
 
   const extraInfo = item => {
