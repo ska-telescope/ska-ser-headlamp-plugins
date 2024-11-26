@@ -29,3 +29,31 @@ export function GetCustomResource(props: {
 export function getHarborUrl(image: string) {
   return `https://harbor.skao.int/harbor/projects/2/repositories/${image}/artifacts-tab`;
 }
+
+type ThemeUnion = 'light' | 'dark';
+export function getThemeName(): ThemeUnion {
+  const themePreference: ThemeUnion = localStorage.headlampThemePreference;
+
+  if (typeof window.matchMedia !== 'function') {
+    return 'light';
+  }
+  const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+  const prefersLight = window.matchMedia('(prefers-color-scheme: light)').matches;
+
+  let themeName: ThemeUnion = 'light';
+  if (themePreference) {
+    // A selected theme preference takes precedence.
+    themeName = themePreference;
+  } else {
+    if (prefersLight) {
+      themeName = 'light';
+    } else if (prefersDark) {
+      themeName = 'dark';
+    }
+  }
+  if (!['light', 'dark'].includes(themeName)) {
+    themeName = 'light';
+  }
+
+  return themeName;
+}
