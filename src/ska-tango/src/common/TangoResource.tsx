@@ -241,12 +241,13 @@ function TangoResourceDetail(props: TangoResourceDetailProps) {
 
   const extraSections = item => {
     const extraSectionsList = [];
-    if (defaultExtraSections) {
-      extraSectionsList.push(...defaultExtraSections(item));
-    }
 
     if (props.extraSections) {
       extraSectionsList.push(...props.extraSections(item));
+    }
+
+    if (defaultExtraSections) {
+      extraSectionsList.push(...defaultExtraSections(item));
     }
 
     return extraSectionsList;
