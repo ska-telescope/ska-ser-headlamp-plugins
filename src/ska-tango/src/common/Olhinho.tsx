@@ -80,7 +80,7 @@ export function DeviceServerConfigView(props: DeviceServerConfigPropsFull) {
           >
             <Editor
               language={'json'}
-              theme={'vs-dark'}
+              theme={themeName === 'dark' ? 'vs-dark' : 'light'}
               value={JSON.stringify(
                 {
                   config,

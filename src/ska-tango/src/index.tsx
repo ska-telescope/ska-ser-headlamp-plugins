@@ -10,6 +10,7 @@ import DatabaseDs from './databaseDsList';
 import DeviceServerDetailedView from './deviceServer';
 import DeviceServers from './deviceServersList';
 import NamespacedTangoResources from './namespaceSection';
+import TangoDetectionWrapper from './tango';
 import { TangoOverviewWrapper } from './tangoOverview';
 
 addIcon('simple-icons:tango', {
@@ -33,9 +34,11 @@ registerRoute({
   exact: true,
   component: () => {
     return (
-      <SectionBox title="TANGO" textAlign="center" paddingTop={2}>
-        <TangoOverviewWrapper />
-      </SectionBox>
+      <TangoDetectionWrapper omit={false}>
+        <SectionBox title="TANGO" textAlign="center" paddingTop={2}>
+          <TangoOverviewWrapper />
+        </SectionBox>
+      </TangoDetectionWrapper>
     );
   },
 });
@@ -115,7 +118,11 @@ registerDetailsViewSectionsProcessor(function addSubheaderSection(resource, sect
   // We place our custom section after the header.
   sections.splice(targetIdx + 1, 0, {
     id: tangoSection,
-    section: <NamespacedTangoResources namespace={resource}></NamespacedTangoResources>,
+    section: (
+      <TangoDetectionWrapper omit>
+        <NamespacedTangoResources namespace={resource} />
+      </TangoDetectionWrapper>
+    ),
   });
 
   return sections;

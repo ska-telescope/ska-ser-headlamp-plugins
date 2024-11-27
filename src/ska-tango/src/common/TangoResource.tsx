@@ -212,6 +212,7 @@ function TangoResourceDetail(props: TangoResourceDetailProps) {
     },
   } as KubeObjectInterface;
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const defaultExtraSections = _item => {
     return [
       {

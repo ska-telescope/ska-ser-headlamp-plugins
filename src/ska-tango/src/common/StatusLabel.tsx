@@ -1,6 +1,7 @@
 import { StatusLabel as HLStatusLabel } from '@kinvolk/headlamp-plugin/lib/components/common';
 import { KubeCRD } from '@kinvolk/headlamp-plugin/lib/lib/k8s/crd';
 import Tooltip from '@mui/material/Tooltip';
+import { capitalizeFirstLetter } from '../utils';
 
 interface StatusLabelProps {
   item: KubeCRD;
@@ -8,41 +9,31 @@ interface StatusLabelProps {
 
 export default function StatusLabel(props: StatusLabelProps) {
   const { item } = props;
-  const state = item?.jsonData?.status?.state.toLowerCase();
+  const detailedState = item?.jsonData?.status?.state.toLowerCase();
+  const state = detailedState?.match(/^([a-zA-Z]+)/)?.[1];
+  const details = detailedState?.match(/\((.*?)\)/)?.[1];
+  const status =
+    {
+      waiting: 'warning',
+      building: 'warning',
+      error: 'error',
+      running: 'success',
+    }[state] || 'error';
 
-  if (state.includes('waiting')) {
-    const details = state.match(/\((.*?)\)/)?.[1];
+  if (details) {
     return (
-      <Tooltip title={details || 'No additional details'} arrow disableInteractive={false}>
+      <Tooltip
+        slotProps={{ tooltip: { sx: { fontSize: '0.9em' } } }}
+        title={details || 'No additional details'}
+        arrow
+        disableInteractive={false}
+      >
         <span style={{ display: 'inline-block' }}>
-          <HLStatusLabel status="warning">Waiting</HLStatusLabel>
-        </span>
-      </Tooltip>
-    );
-  }
-  if (state.includes('building')) {
-    const details = state.match(/\((.*?)\)/)?.[1];
-    return (
-      <Tooltip title={details || 'No additional details'} arrow disableInteractive={false}>
-        <span style={{ display: 'inline-block' }}>
-          <HLStatusLabel status="warning">Building</HLStatusLabel>
-        </span>
-      </Tooltip>
-    );
-  }
-  if (state.includes('error')) {  
-    return (
-      <Tooltip title={state || 'No additional details'} arrow disableInteractive={false}>
-        <span style={{ display: 'inline-block' }}>
-          <HLStatusLabel status="error">Error</HLStatusLabel>
+          <HLStatusLabel status={status}>{capitalizeFirstLetter(state)}</HLStatusLabel>
         </span>
       </Tooltip>
     );
   }
 
-  if (state === 'running') {
-    return <HLStatusLabel status="success">Running</HLStatusLabel>;
-  }
-
-  return <HLStatusLabel status="error">{item?.jsonData?.status?.state}</HLStatusLabel>;
+  return <HLStatusLabel status={status}>{capitalizeFirstLetter(state)}</HLStatusLabel>;
 }

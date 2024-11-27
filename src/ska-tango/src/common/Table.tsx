@@ -5,16 +5,13 @@ import {
   TableColumn,
   TableProps as HTableProps,
 } from '@kinvolk/headlamp-plugin/lib/components/common';
+import { StatusLabel as HLStatusLabel } from '@kinvolk/headlamp-plugin/lib/components/common';
 import { KubeObject } from '@kinvolk/headlamp-plugin/lib/lib/k8s/cluster';
+import Tooltip from '@mui/material/Tooltip';
 import React from 'react';
 import { DeviceServerConfigAction } from './Olhinho';
-import StatefulSetFind from './StatefulSet';
+import StatefulSetFinder from './StatefulSetFinder';
 import StatusLabel from './StatusLabel';
-import Tooltip from '@mui/material/Tooltip';
-import { StatusLabel as HLStatusLabel } from '@kinvolk/headlamp-plugin/lib/components/common';
-
-
-
 
 type CommonColumnType = 'namespace' | 'name' | 'age' | 'status';
 
@@ -65,7 +62,6 @@ function prepareNameColumn(colProps: Partial<NameColumn> = {}): TableCol {
 
 export function Table(props: TableProps) {
   const { columns, data, ...otherProps } = props;
-
   const processedColumns = React.useMemo(() => {
     return columns.map(column => {
       if (typeof column === 'string') {
@@ -116,20 +112,53 @@ export function Table(props: TableProps) {
             return {
               header: 'Devices',
               Cell: ({ row: { original: item } }) => {
-                const devicesReady = item?.jsonData.status?.devicereadycount || 0;
                 const devicesTotal = item?.jsonData.status?.devicecount || 1;
-                const percentage = ((devicesReady / devicesTotal) * 100).toFixed(1);
-                // Determine progress bar color
-                const progressColor =
-                percentage === "100.0"
-                  ? 'success' // Green for 100%
-                  : percentage === "0.0"
-                  ? 'error' // Red for 0%
-                  : 'warning'; // Orange for values in between
+                const devicesReady = item?.jsonData.status?.devicereadycount || 0;
                 return (
-                  <Tooltip title={`${devicesReady} of ${devicesTotal} devices ready`} arrow disableInteractive={false}>
+                  <Tooltip
+                    slotProps={{ tooltip: { sx: { fontSize: '0.9em' } } }}
+                    title={`${devicesReady} of ${devicesTotal} devices ready`}
+                    arrow
+                    disableInteractive={false}
+                  >
                     <span style={{ display: 'inline-block' }}>
-                      <HLStatusLabel status={progressColor}>{`${devicesReady}/${devicesTotal}`}</HLStatusLabel>
+                      <HLStatusLabel
+                        status={
+                          devicesReady === devicesTotal
+                            ? 'success'
+                            : devicesReady === 0
+                            ? 'error'
+                            : 'warning'
+                        }
+                      >{`${devicesReady}/${devicesTotal}`}</HLStatusLabel>
+                    </span>
+                  </Tooltip>
+                );
+              },
+            };
+          case 'components':
+            return {
+              header: 'Components',
+              Cell: ({ row: { original: item } }) => {
+                const componentsTotal = item?.jsonData.status?.replicas || 0;
+                const componentsReady = item?.jsonData.status?.succeeded || 0;
+                return (
+                  <Tooltip
+                    slotProps={{ tooltip: { sx: { fontSize: '0.9em' } } }}
+                    title={`${componentsReady} of ${componentsTotal} components ready`}
+                    arrow
+                    disableInteractive={false}
+                  >
+                    <span style={{ display: 'inline-block' }}>
+                      <HLStatusLabel
+                        status={
+                          componentsReady === componentsTotal
+                            ? 'success'
+                            : componentsReady === 0
+                            ? 'error'
+                            : 'warning'
+                        }
+                      >{`${componentsReady}/${componentsTotal}`}</HLStatusLabel>
                     </span>
                   </Tooltip>
                 );
@@ -137,14 +166,26 @@ export function Table(props: TableProps) {
             };
           case 'statefulset':
             return {
-              header: 'StatefulSet',
+              header: 'DS Stateful Set',
               Cell: ({ row: { original: item } }) => {
-                const labelSelector = 'app.kubernetes.io/instance=' + item.metadata.name;
                 return (
-                  <StatefulSetFind
+                  <StatefulSetFinder
                     name={item.metadata.name}
                     namespace={item.metadata.namespace}
-                    labelSelector={labelSelector}
+                    allowedNames={['databaseds-ds', 'deviceserver']}
+                  />
+                );
+              },
+            };
+          case 'dbstatefulset':
+            return {
+              header: 'DB Stateful Set',
+              Cell: ({ row: { original: item } }) => {
+                return (
+                  <StatefulSetFinder
+                    name={item.metadata.name}
+                    namespace={item.metadata.namespace}
+                    allowedNames={['databaseds-tangodb']}
                   />
                 );
               },
