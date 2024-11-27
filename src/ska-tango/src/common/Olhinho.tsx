@@ -34,7 +34,7 @@ export function DeviceServerConfigAction(props: DeviceServerConfigActionPropsFul
     <>
       <ActionButton
         description=""
-        buttonStyle={buttonStyle || 'menu'}
+        buttonStyle={buttonStyle || 'action'}
         onClick={() => setOpen(true)}
         icon="mdi:eye"
         edge="end"

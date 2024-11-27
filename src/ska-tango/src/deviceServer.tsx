@@ -18,14 +18,14 @@ export default function DeviceServerDetailedView() {
     return [
       {
         name: 'Dependencies',
-        value: <MetadataDictGrid showKeys={false} dict={dependencies}/>
+        value: <MetadataDictGrid showKeys={false} dict={dependencies} />,
       },
-      (loadBalancerIP
+      loadBalancerIP
         ? {
             name: 'Loadbalancer IP',
             value: loadBalancerIP,
           }
-        : null)
+        : null,
     ].filter(info => info !== null);
   };
 
@@ -55,7 +55,7 @@ export default function DeviceServerDetailedView() {
     ];
   };
 
-  const extraSections = (item: any) => {
+  const extraSections = item => {
     return [
       {
         id: 'devices',
@@ -72,8 +72,8 @@ export default function DeviceServerDetailedView() {
     <TangoResourceDetailedView
       resourceType="deviceservers"
       actions={actions}
-      extraSections={extraSections}
       extraInfo={extraInfo}
+      extraSections={extraSections}
     />
   );
 }

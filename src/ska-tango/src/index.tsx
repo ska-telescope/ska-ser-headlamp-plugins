@@ -2,11 +2,13 @@ import { addIcon } from '@iconify/react';
 import { registerRoute, registerSidebarEntry } from '@kinvolk/headlamp-plugin/lib';
 import {
   DefaultDetailsViewSection,
+  registerDetailsViewHeaderActionsProcessor,
   registerDetailsViewSectionsProcessor,
 } from '@kinvolk/headlamp-plugin/lib';
 import { SectionBox } from '@kinvolk/headlamp-plugin/lib/components/common';
 import DatabaseDsDetailedView from './databaseDs';
 import DatabaseDs from './databaseDsList';
+import { DeviceDependencyMapActionWrapper } from './deviceDependencyMap';
 import DeviceServerDetailedView from './deviceServer';
 import DeviceServers from './deviceServersList';
 import NamespacedTangoResources from './namespaceSection';
@@ -126,4 +128,26 @@ registerDetailsViewSectionsProcessor(function addSubheaderSection(resource, sect
   });
 
   return sections;
+});
+
+registerDetailsViewHeaderActionsProcessor(function addNamespaceDeviceDependencyMap(
+  resource,
+  actions
+) {
+  if (!resource || resource?.jsonData?.kind !== 'Namespace') {
+    return actions;
+  }
+
+  const deviceDependecyMapAction = 'device_dependency_map';
+  if (actions.findIndex(action => action.id === deviceDependecyMapAction) !== -1) {
+    return actions;
+  }
+
+  const targetIdx = actions.findIndex(actions => actions.id === 'prom_metrics');
+  actions.splice(targetIdx > -1 ? targetIdx + 1 : 0, 0, {
+    id: deviceDependecyMapAction,
+    action: <DeviceDependencyMapActionWrapper namespace={resource} />,
+  });
+
+  return actions;
 });

@@ -1,7 +1,7 @@
 import { StatusLabel as HLStatusLabel } from '@kinvolk/headlamp-plugin/lib/components/common';
 import { KubeCRD } from '@kinvolk/headlamp-plugin/lib/lib/k8s/crd';
 import Tooltip from '@mui/material/Tooltip';
-import { capitalizeFirstLetter } from '../utils';
+import { capitalizeFirstLetter, getDeviceServerStatus } from '../utils';
 
 interface StatusLabelProps {
   item: KubeCRD;
@@ -9,16 +9,7 @@ interface StatusLabelProps {
 
 export default function StatusLabel(props: StatusLabelProps) {
   const { item } = props;
-  const detailedState = item?.jsonData?.status?.state.toLowerCase();
-  const state = detailedState?.match(/^([a-zA-Z]+)/)?.[1];
-  const details = detailedState?.match(/\((.*?)\)/)?.[1];
-  const status =
-    {
-      waiting: 'warning',
-      building: 'warning',
-      error: 'error',
-      running: 'success',
-    }[state] || 'error';
+  const { status, state, details } = getDeviceServerStatus(item?.jsonData?.status);
 
   if (details) {
     return (

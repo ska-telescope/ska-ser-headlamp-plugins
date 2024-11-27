@@ -37,7 +37,7 @@ export interface DependencyItemProps {
 
 function getReleaseTooltip(dependency: HelmReleaseDependency) {
   const latestVersionInfo = dependency?.latestVersionInfo || null;
-  if (!latestVersionInfo && !!dependency) {
+  if (!latestVersionInfo && !dependency) {
     return '* ERROR: Unable to fetch chart information';
   }
 

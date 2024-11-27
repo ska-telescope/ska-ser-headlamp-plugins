@@ -148,8 +148,6 @@ function TangoResourceDetail(props: TangoResourceDetailProps) {
   });
 
   const defaultExtraInfo = item => {
-    const loadBalancerIP =
-    item?.jsonData?.status?.resources?.lbs?.[0]?.ip || 'No IP Assigned';
     return [
       {
         name: 'Status',
@@ -195,10 +193,6 @@ function TangoResourceDetail(props: TangoResourceDetailProps) {
           </>
         ),
       },
-      {
-        name: "Loadbalancer IP",
-        value: loadBalancerIP
-      }
     ];
   };
 
@@ -261,12 +255,12 @@ function TangoResourceDetail(props: TangoResourceDetailProps) {
 
   const actions = item => {
     const actionsList = [];
-    if (defaultActions) {
-      actionsList.push(...defaultActions(item));
-    }
-
     if (props.actions) {
       actionsList.push(...props.actions(item));
+    }
+
+    if (defaultActions) {
+      actionsList.push(...defaultActions(item));
     }
 
     return actionsList;

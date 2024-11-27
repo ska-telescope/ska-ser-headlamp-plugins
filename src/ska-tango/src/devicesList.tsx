@@ -1,7 +1,7 @@
 import { DateLabel, Loader, SimpleTable } from '@kinvolk/headlamp-plugin/lib/CommonComponents';
 import { StatusLabel as HLStatusLabel } from '@kinvolk/headlamp-plugin/lib/components/common';
 import Tooltip from '@mui/material/Tooltip';
-
+import { tangoDeviceStatusColorFromState } from './utils';
 
 export interface DevicesListProps {
   resources?: any;
@@ -54,16 +54,7 @@ export default function DevicesList(props: DevicesListProps) {
       label: 'State',
       getter: device => {
         const state = device.state || 'UNKNOWN';
-        const redStates = ['FAULT', 'ALARM', 'UNKNOWN'];
-        const orangeStates = ['OFF', 'CLOSE', 'STANDBY', 'INIT', 'DISABLE'];
-        let color: 'success' | 'warning' | 'error' | '' = 'success';
-
-        if (redStates.includes(state.toUpperCase())) {
-          color = 'error';
-        } else if (orangeStates.includes(state.toUpperCase())) {
-          color = 'warning';
-        }
-        return(
+        return (
           <Tooltip
             slotProps={{ tooltip: { sx: { fontSize: '0.9em' } } }}
             title={device.status}
@@ -71,10 +62,12 @@ export default function DevicesList(props: DevicesListProps) {
             disableInteractive={false}
           >
             <span style={{ display: 'inline-block' }}>
-              <HLStatusLabel status={color}>{state}</HLStatusLabel>
+              <HLStatusLabel status={tangoDeviceStatusColorFromState(device)}>
+                {state}
+              </HLStatusLabel>
             </span>
           </Tooltip>
-        )
+        );
       },
       sort: (a, b) => {
         return a?.state > b?.pistateng ? 1 : -1;
