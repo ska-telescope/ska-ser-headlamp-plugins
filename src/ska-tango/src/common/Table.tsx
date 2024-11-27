@@ -10,6 +10,11 @@ import React from 'react';
 import { DeviceServerConfigAction } from './Olhinho';
 import StatefulSetFind from './StatefulSet';
 import StatusLabel from './StatusLabel';
+import Tooltip from '@mui/material/Tooltip';
+import { StatusLabel as HLStatusLabel } from '@kinvolk/headlamp-plugin/lib/components/common';
+
+
+
 
 type CommonColumnType = 'namespace' | 'name' | 'age' | 'status';
 
@@ -108,7 +113,28 @@ export function Table(props: TableProps) {
               },
             };
           case 'devices':
-            return '<devicesReady>/<devicesTotal>';
+            return {
+              header: 'Devices',
+              Cell: ({ row: { original: item } }) => {
+                const devicesReady = item?.jsonData.status?.devicereadycount || 0;
+                const devicesTotal = item?.jsonData.status?.devicecount || 1;
+                const percentage = ((devicesReady / devicesTotal) * 100).toFixed(1);
+                // Determine progress bar color
+                const progressColor =
+                percentage === "100.0"
+                  ? 'success' // Green for 100%
+                  : percentage === "0.0"
+                  ? 'error' // Red for 0%
+                  : 'warning'; // Orange for values in between
+                return (
+                  <Tooltip title={`${devicesReady} of ${devicesTotal} devices ready`} arrow disableInteractive={false}>
+                    <span style={{ display: 'inline-block' }}>
+                      <HLStatusLabel status={progressColor}>{`${devicesReady}/${devicesTotal}`}</HLStatusLabel>
+                    </span>
+                  </Tooltip>
+                );
+              },
+            };
           case 'statefulset':
             return {
               header: 'StatefulSet',

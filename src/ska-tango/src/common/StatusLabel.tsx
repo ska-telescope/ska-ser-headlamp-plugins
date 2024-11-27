@@ -20,11 +20,19 @@ export default function StatusLabel(props: StatusLabelProps) {
       </Tooltip>
     );
   }
-
-  if (state.includes('error')) {
+  if (state.includes('building')) {
     const details = state.match(/\((.*?)\)/)?.[1];
     return (
       <Tooltip title={details || 'No additional details'} arrow disableInteractive={false}>
+        <span style={{ display: 'inline-block' }}>
+          <HLStatusLabel status="warning">Building</HLStatusLabel>
+        </span>
+      </Tooltip>
+    );
+  }
+  if (state.includes('error')) {  
+    return (
+      <Tooltip title={state || 'No additional details'} arrow disableInteractive={false}>
         <span style={{ display: 'inline-block' }}>
           <HLStatusLabel status="error">Error</HLStatusLabel>
         </span>

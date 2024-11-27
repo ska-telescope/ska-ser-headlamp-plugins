@@ -76,8 +76,8 @@ export function DeviceServersList(props: DeviceServersListProps) {
     [resource] = props.resourceClass.useList(queryData);
   }
 
-  const namespacedColumns = ['name', 'statefulset', 'status', 'age', 'config'];
-  const generalColumns = ['name', 'namespace', 'status', 'age', 'config'];
+  const namespacedColumns = ['name', 'statefulset', 'devices','status', 'age', 'config'];
+  const generalColumns = ['name', 'namespace','devices', 'status', 'age', 'config'];
 
   if (!props || (props?.hideWithoutItems && (resource === undefined || resource?.length === 0))) {
     return <></>;
