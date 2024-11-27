@@ -1,5 +1,7 @@
 import { DateLabel, Loader, SimpleTable } from '@kinvolk/headlamp-plugin/lib/CommonComponents';
 import { StatusLabel as HLStatusLabel } from '@kinvolk/headlamp-plugin/lib/components/common';
+import Tooltip from '@mui/material/Tooltip';
+
 
 export interface DevicesListProps {
   resources?: any;
@@ -61,8 +63,18 @@ export default function DevicesList(props: DevicesListProps) {
         } else if (orangeStates.includes(state.toUpperCase())) {
           color = 'warning';
         }
-
-        return <HLStatusLabel status={color}>{state}</HLStatusLabel>;
+        return(
+          <Tooltip
+            slotProps={{ tooltip: { sx: { fontSize: '0.9em' } } }}
+            title={device.status}
+            arrow
+            disableInteractive={false}
+          >
+            <span style={{ display: 'inline-block' }}>
+              <HLStatusLabel status={color}>{state}</HLStatusLabel>
+            </span>
+          </Tooltip>
+        )
       },
       sort: (a, b) => {
         return a?.state > b?.pistateng ? 1 : -1;
