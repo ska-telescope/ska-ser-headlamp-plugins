@@ -81,7 +81,7 @@ dev:
 	done; \
 
 stop-dev:
-	@PROCESSES=$$(ps -au | egrep "node.*headlamp-plugin start" | awk '{print $$2}' | xargs); \
+	@PROCESSES=$$(ps -au $$(id -u) | egrep "node.*headlamp-plugin start" | awk '{print $$2}' | xargs); \
 	for PROCESS in $$PROCESSES; do \
 		kill -9 $$PROCESS; \
 	done;

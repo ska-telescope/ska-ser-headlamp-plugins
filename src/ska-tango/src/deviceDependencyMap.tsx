@@ -2,13 +2,13 @@ import '@xyflow/react/dist/style.css';
 import Dagre from '@dagrejs/dagre';
 import { Icon } from '@iconify/react';
 import { K8s } from '@kinvolk/headlamp-plugin/lib';
-import { ActionButton, ButtonStyle, Dialog, Loader } from '@kinvolk/headlamp-plugin/lib/components/common';
+import { ActionButton, ButtonStyle, Dialog } from '@kinvolk/headlamp-plugin/lib/components/common';
 import { KubeCRD } from '@kinvolk/headlamp-plugin/lib/lib/k8s/crd';
 import { KubeObjectInterface } from '@kinvolk/headlamp-plugin/lib/lib/k8s/KubeObject';
 import Typography from '@material-ui/core/Typography';
 import { DialogActions, DialogContent } from '@mui/material';
 import { useTheme } from '@mui/material';
-import { Paper, Box } from '@mui/material';
+import { Box, Paper } from '@mui/material';
 import Button from '@mui/material/Button';
 import {
   Background,
@@ -240,7 +240,11 @@ export function DeviceDependencyMap(props: DependencyMapProps) {
                   y: 0,
                 }}
               >
-                <Background bgColor={themeName === 'dark' ? undefined : '#807E7D'} gap={24} size={1} />
+                <Background
+                  bgColor={themeName === 'dark' ? undefined : '#807E7D'}
+                  gap={24}
+                  size={1}
+                />
                 <MiniMap bgColor={primaryTextColor} />
                 <Controls />
                 <Legend />
@@ -289,7 +293,7 @@ export function DeviceDependencyMapAction(props: DependencyMapActionProps) {
         description="TANGO Device Dependency Map"
         buttonStyle={buttonStyle || 'action'}
         onClick={() => setOpen(true)}
-        icon="mdi:graph"
+        icon="custom-icons:tango"
         iconButtonProps={{
           disabled: !filteredDeviceServers || filteredDeviceServers.length === 0,
         }}
@@ -327,7 +331,7 @@ export function DeviceDependencyMapActionWrapper(props: DependencyMapActionProps
         description="TANGO Device Dependency Map"
         buttonStyle={buttonStyle || 'action'}
         onClick={() => {}}
-        icon="mdi:graph"
+        icon="custom-icons:tango"
         iconButtonProps={{
           disabled: true,
         }}
