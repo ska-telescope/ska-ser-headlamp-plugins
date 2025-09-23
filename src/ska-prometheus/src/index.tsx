@@ -11,10 +11,12 @@ import { GenericMetricsChart } from './components/Chart/GenericMetricsChart/Gene
 import { KedaChart } from './components/Chart/KedaChart/KedaChart';
 import { Settings } from './components/Settings/Settings';
 import { VisibilityButton } from './components/VisibilityButton/VisibilityButton';
+import { SKAOPrometheusMetrics } from './skao/PrometheusMetrics';
 import { ChartEnabledKinds, PLUGIN_NAME } from './util';
 import { getNodeClaimChartConfigs, getNodePoolChartConfigs } from './util';
 
-function PrometheusMetrics(resource: DetailsViewSectionProps) {
+// prettier-ignore
+function PrometheusMetrics(resource: DetailsViewSectionProps) { // eslint-disable-line no-unused-vars
   if (resource.kind === 'Pod' || resource.kind === 'Job' || resource.kind === 'CronJob') {
     return (
       <GenericMetricsChart
@@ -115,7 +117,7 @@ registerDetailsViewSectionsProcessor(function addSubheaderSection(resource, sect
     return sections;
   }
 
-  const prometheusSection = 'prom_metrics';
+  const prometheusSection = 'ska_prom_metrics';
   if (sections.findIndex(section => section.id === prometheusSection) !== -1) {
     return sections;
   }
@@ -131,10 +133,11 @@ registerDetailsViewSectionsProcessor(function addSubheaderSection(resource, sect
   // We place our custom section after the header.
   sections.splice(detailsHeaderIdx + 1, 0, {
     id: prometheusSection,
-    section: PrometheusMetrics(resource),
+    section: SKAOPrometheusMetrics(resource),
   });
 
-  return sections;
+  // SKAO Edit: Evict built-in prometheus plugin view
+  return sections.filter(section => section.id !== 'prom_metrics');
 });
 
 registerDetailsViewHeaderActionsProcessor(function addPrometheusMetricsButton(resource, actions) {

@@ -4,8 +4,6 @@ import Box from '@mui/material/Box';
 import ListSubheader from '@mui/material/ListSubheader';
 import MenuItem from '@mui/material/MenuItem';
 import Select from '@mui/material/Select';
-import Switch from '@mui/material/Switch';
-import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 import { useEffect, useState } from 'react';
 
@@ -48,7 +46,7 @@ interface SettingsProps {
 export function Settings(props: SettingsProps) {
   const { data, onDataChange } = props;
   const [selectedCluster, setSelectedCluster] = useState('');
-  const [addressError, setAddressError] = useState(false);
+  // const [addressError, setAddressError] = useState(false);
 
   const clusters = useClustersConf() || {};
 
@@ -74,8 +72,8 @@ export function Settings(props: SettingsProps) {
 
   const selectedClusterData = data?.[selectedCluster] || {};
   const isMetricsEnabled = selectedClusterData.isMetricsEnabled ?? true;
-  const isAutoDetectEnabled = isMetricsEnabled && (selectedClusterData.autoDetect ?? true);
-  const isAddressFieldEnabled = isMetricsEnabled && !isAutoDetectEnabled;
+  // const isAutoDetectEnabled = isMetricsEnabled && (selectedClusterData.autoDetect ?? true);
+  // const isAddressFieldEnabled = isMetricsEnabled && !isAutoDetectEnabled;
 
   useEffect(() => {
     if (selectedClusterData.address) {
@@ -86,7 +84,8 @@ export function Settings(props: SettingsProps) {
   }, [selectedClusterData.address]);
 
   const settingsRows = [
-    {
+    // SKAO edit: Remove from settings that we don't want to let users change
+    /*{
       name: 'Enable Metrics',
       value: (
         <Switch
@@ -165,7 +164,7 @@ export function Settings(props: SettingsProps) {
           }}
         />
       ),
-    },
+    },*/
     {
       name: 'Default Timespan',
       value: (

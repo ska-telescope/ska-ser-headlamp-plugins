@@ -14,7 +14,7 @@ export interface VisibilityButtonProps {
 export function VisibilityButton(props: VisibilityButtonProps) {
   const { resource } = props;
   const cluster = useCluster();
-  const [isEnabled, setIsEnabled] = useState(false);
+  const [isEnabled, setIsEnabled] = useState(true); // SKAO Edit: Show prometheus metrics by default
   const configStore = getConfigStore();
   const useClusterConfig = configStore.useConfig();
   const clusterConfig = useClusterConfig();

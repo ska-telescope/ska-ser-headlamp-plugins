@@ -167,6 +167,7 @@ export const ChartEnabledKinds = [
   'ScaledJob',
   'NodePool',
   'NodeClaim',
+  'Namespace', // SKAO Edit: Add Namespace
 ];
 
 /**
