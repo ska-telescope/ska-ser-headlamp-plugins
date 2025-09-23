@@ -23,8 +23,8 @@ import {
 } from '@xyflow/react';
 import md5 from 'md5';
 import { Dispatch, SetStateAction, useEffect, useMemo, useRef, useState } from 'react';
+import { getThemeName } from '../utils';
 import { DatabaseDsNode, DeviceServerNode } from './deviceNodes';
-import { getThemeName } from './utils';
 
 export interface DependencyMapActionProps {
   namespace: K8s.ResourceClasses.Namespace;

@@ -6,11 +6,7 @@ import {
   OwnedPodsSection,
   StatusLabel as RStatusLabel,
 } from '@kinvolk/headlamp-plugin/lib/components/common';
-import {
-  KubeMetadata,
-  KubeObject,
-  KubeObjectInterface,
-} from '@kinvolk/headlamp-plugin/lib/lib/k8s/cluster';
+import { KubeMetadata, KubeObject } from '@kinvolk/headlamp-plugin/lib/lib/k8s/cluster';
 import { Grid } from '@material-ui/core';
 import { Box } from '@material-ui/core';
 import { Paper } from '@mui/material';
@@ -196,24 +192,26 @@ function TangoResourceDetail(props: TangoResourceDetailProps) {
     ];
   };
 
-  const targetOwnerMetadata = {
-    namespace: props.namespace,
-  } as KubeMetadata;
-
-  const targetOwner = {
-    kind: 'StatefulSet',
-    metadata: targetOwnerMetadata,
-    spec: {
-      selector: {
-        matchLabels: {
-          'app.kubernetes.io/instance': props.name,
-        },
-      },
-    },
-  } as KubeObjectInterface;
-
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const defaultExtraSections = _item => {
+    const targetOwnerMetadata = {
+      namespace: props.namespace,
+    } as KubeMetadata;
+
+    const targetOwner = {
+      kind: 'StatefulSet',
+      metadata: targetOwnerMetadata,
+      jsonData: {
+        spec: {
+          selector: {
+            matchLabels: {
+              'app.kubernetes.io/instance': props.name,
+            },
+          },
+        },
+      },
+    } as KubeObject;
+
     return [
       {
         id: 'headlamp.tango-resource-owned-pods',

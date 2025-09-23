@@ -8,7 +8,7 @@ import {
   getDeviceServerStatus,
   tangoDeviceStatusColorFromState,
   timeAgo,
-} from './utils';
+} from '../utils';
 
 export interface NodeLabelProps {
   status: string;
