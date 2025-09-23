@@ -142,16 +142,16 @@ export function Organization() {
             </Grid>
             {/* MOST */}
             <Grid item xs={12} sm={4}>
-              <TileChart title={mostFrequentString(namespaceTeams)} legend={<p>Top Team</p>} />
+              <TileChart title="Top Team" legend={<p>{mostFrequentString(namespaceTeams)}</p>} />
             </Grid>
             <Grid item xs={12} sm={4}>
               <TileChart
-                title={mostFrequentString(namespaceProjects)}
-                legend={<p>Top Project</p>}
+                title="Top Project"
+                legend={<p>{mostFrequentString(namespaceProjects)}</p>}
               />
             </Grid>
             <Grid item xs={12} sm={4}>
-              <TileChart title={mostFrequentString(namespaceUsers)} legend={<p>Top User</p>} />
+              <TileChart title="Top User" legend={<p>{mostFrequentString(namespaceUsers)}</p>} />
             </Grid>
           </Grid>
         )}

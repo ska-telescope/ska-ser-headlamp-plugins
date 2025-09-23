@@ -64,8 +64,8 @@ registerDetailsViewHeaderActionsProcessor(function addResourceUrls(resource, act
     action: (
       <ConfigBasedAction
         namespace={resource}
-        description="Monitoring"
-        config="namespaceDashboardUrl"
+        description="Monitoring Dashboard"
+        config="namespaceMonitoringUrl"
         icon="custom-icons:grafana"
       />
     ),

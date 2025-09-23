@@ -1,6 +1,6 @@
 {
   "name": "ska-helm-release",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Plugin to show Helm release information on Namespaces",
   "scripts": {
     "start": "headlamp-plugin start",
@@ -30,11 +30,13 @@
     ]
   },
   "devDependencies": {
-    "@headlamp-k8s/eslint-config": "^0.7.0",
-    "@kinvolk/headlamp-plugin": "^0.10.0"
+    "@kinvolk/headlamp-plugin": "^0.12.0"
   },
   "dependencies": {
     "@material-ui/core": "^4.12.4",
     "pako": "^2.1.0"
+  },
+  "overrides": {
+    "typescript": "5.6.2"
   }
 }

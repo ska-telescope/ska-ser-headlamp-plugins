@@ -119,7 +119,7 @@ export function DependencyItem(props: DependencyItemProps) {
         <Grid item>
           <HelmChartUrlWrapper dependency={dependency}>
             <PaddedChip
-              icon={getDepedencyIcon(dependency)}
+              icon={getDepedencyIcon()}
               label={
                 <>
                   {dependency.name} <strong>{dependency.version}</strong>

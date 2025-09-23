@@ -53,7 +53,7 @@ git submodule update --init --recursive
 To test locally the plugins, start by installing the Headlamp app locally:
 
 ```
-VERSION=0.31.1 # Go to https://github.com/headlamp-k8s/headlamp/releases, get latest release
+VERSION=0.34.0 # Go to https://github.com/headlamp-k8s/headlamp/releases, get latest release
 HEADLAMP_INSTALL_DIR=~/Apps/Headlamp-$VERSION-linux-x64
 mkdir $HEADLAMP_INSTALL_DIR
 cd $HEADLAMP_INSTALL_DIR
