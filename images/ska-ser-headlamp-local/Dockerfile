@@ -22,7 +22,7 @@ RUN addgroup -g 1000 -S headlamp && adduser -u 1000 -G headlamp -S headlamp
 RUN chown -R headlamp:headlamp /headlamp
 
 # Install curl for easier debugging if needed
-RUN apk add --no-cache curl
+RUN apk add --no-cache curl aws-cli
 
 # Switch back to headlamp user
 USER headlamp
