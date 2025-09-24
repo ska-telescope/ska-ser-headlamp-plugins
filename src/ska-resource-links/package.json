@@ -1,5 +1,5 @@
 {
-  "name": "ska-resouce-links",
+  "name": "ska-resource-links",
   "version": "0.0.1",
   "description": "Plugin to add resource links to Kubernetes resources",
   "scripts": {
