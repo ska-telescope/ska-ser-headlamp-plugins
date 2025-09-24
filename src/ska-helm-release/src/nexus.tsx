@@ -46,7 +46,9 @@ export default async function getLatestHelmChartReleaseFromCAR(
     let filteredItems = items;
     if (items && items.length > 0) {
       // Filter out versions RC versions
-      filteredItems = items.filter(item => !item.version.match('.*(.|-)rc(.|-|$)($|[0-9]+$)')).filter(item => !item.version.endsWith('-dirty'));
+      filteredItems = items
+        .filter(item => !item.version.match('.*(.|-)rc(.|-|$)($|[0-9]+$)'))
+        .filter(item => !item.version.endsWith('-dirty'));
     }
 
     if (filteredItems && filteredItems.length > 0) {

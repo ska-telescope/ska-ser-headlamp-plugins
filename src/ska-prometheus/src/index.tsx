@@ -117,7 +117,7 @@ registerDetailsViewSectionsProcessor(function addSubheaderSection(resource, sect
     return sections;
   }
 
-  const prometheusSection = 'ska_prom_metrics';
+  const prometheusSection = '_prom_metrics';
   if (sections.findIndex(section => section.id === prometheusSection) !== -1) {
     return sections;
   }
