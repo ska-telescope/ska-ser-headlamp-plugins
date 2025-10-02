@@ -12,11 +12,17 @@ export interface CarProxy {
   serviceNamespace: string;
 }
 
+export interface ChartLatestVersionInfo {
+  version: string | null;
+  resolved: boolean;
+  error: string | null;
+}
+
 export default async function getLatestHelmChartReleaseFromCAR(
   repository: string,
   chart: string,
   carProxy: CarProxy
-): Promise<[string, string]> {
+): Promise<ChartLatestVersionInfo> {
   const params = new URLSearchParams({
     repository: repository,
     name: chart,
@@ -37,14 +43,34 @@ export default async function getLatestHelmChartReleaseFromCAR(
   if (response.status === 200) {
     const jsonData = await response.json();
     const items = jsonData.items as ChartVersion[];
+    let filteredItems = items;
     if (items && items.length > 0) {
-      return [null, items[0].version];
-    } else {
-      const error = `Couldn't find version information for chart '${chart}'`;
-      console.warn(error);
-      return [error, null];
+      // Filter out versions RC versions
+      filteredItems = items
+        .filter(item => !item.version.match('.*(.|-)rc(.|-|$)($|[0-9]+$)'))
+        .filter(item => !item.version.endsWith('-dirty'));
     }
-  } else {
-    return [response.statusText, null];
+
+    if (filteredItems && filteredItems.length > 0) {
+      return {
+        version: filteredItems[0].version,
+        error: null,
+        resolved: true,
+      } as ChartLatestVersionInfo;
+    }
+
+    const error = `Couldn't find version information for chart '${chart}'`;
+    console.warn(error);
+    return {
+      version: null,
+      error: error,
+      resolved: true,
+    } as ChartLatestVersionInfo;
   }
+
+  return {
+    version: null,
+    error: response.statusText,
+    resolved: true,
+  } as ChartLatestVersionInfo;
 }

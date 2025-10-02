@@ -1,10 +1,10 @@
-ARG BASE_IMAGE="artefact.skao.int/ska-ser-headlamp-plugins:0.0.2"
+ARG BASE_IMAGE="artefact.skao.int/ska-ser-headlamp-plugins:0.0.3"
 FROM $BASE_IMAGE AS plugins-builder
 
 # Run the plugin installation script inside the plugins-builder stage
 RUN /bin/bash -c "/install-plugins.sh"
 
-FROM ghcr.io/headlamp-k8s/headlamp:v0.26.0 AS final
+FROM ghcr.io/headlamp-k8s/headlamp:v0.34.0 AS final
 
 # Copy plugins from the custom builder image to the Headlamp plugins directory
 COPY --from=plugins-builder /plugins /headlamp/plugins
@@ -22,7 +22,7 @@ RUN addgroup -g 1000 -S headlamp && adduser -u 1000 -G headlamp -S headlamp
 RUN chown -R headlamp:headlamp /headlamp
 
 # Install curl for easier debugging if needed
-RUN apk add --no-cache curl
+RUN apk add --no-cache curl aws-cli
 
 # Switch back to headlamp user
 USER headlamp

@@ -1,10 +1,10 @@
 import { K8s } from '@kinvolk/headlamp-plugin/lib';
 import {
+  DateLabel,
   SectionBox,
   SimpleTable,
   StatusLabel,
 } from '@kinvolk/headlamp-plugin/lib/CommonComponents';
-import { amber, green, orange } from '@mui/material/colors';
 import { useEffect, useState } from 'react';
 import {
   fetchHelmReleases,
@@ -19,55 +19,18 @@ export interface HelmReleaseProps {
 }
 
 import { Grid } from '@material-ui/core';
-import { Tooltip } from '@material-ui/core';
-import { makeStyles } from '@material-ui/core';
 import { Chip } from '@mui/material';
 import { styled } from '@mui/system';
-import { SvgDanger } from './icons';
+import { DependencyItem } from './dependency';
 import { CarProxy } from './nexus';
 
-const PaddedChip = styled(Chip)({
-  paddingTop: '2px',
-  paddingBottom: '2px',
+export const PaddedChip = styled(Chip)({
+  paddingTop: '0.2rem',
 });
-
-const useStyles = makeStyles({
-  tooltip: {
-    fontSize: '0.8em',
-  },
-});
-
-function getReleaseTooltip(dependency: HelmReleaseDependency) {
-  if (!dependency.error && !dependency.hasVersionInfo) {
-    if (dependency.repository.startsWith('file://')) {
-      return (
-        <>
-          {dependency.repository}
-          <br />* Dependency local to the installed chart
-        </>
-      );
-    }
-
-    return '* ERROR: Unable to fetch chart information';
-  }
-
-  return dependency.error ? (
-    <>
-      {dependency.repository}
-      <br />* ERROR: {dependency.error}
-    </>
-  ) : (
-    <>
-      {dependency.repository}
-      <br />* Latest Version: {dependency.latestVersion || dependency.version}
-    </>
-  );
-}
 
 export default function HelmRelease(props: HelmReleaseProps) {
   const [releases, setHelmReleases] = useState([]);
   const [carProxyInfo, setCarProxyInfo] = useState<CarProxy | null>(null);
-  const styles = useStyles();
 
   useEffect(() => {
     (async () => {
@@ -88,19 +51,18 @@ export default function HelmRelease(props: HelmReleaseProps) {
   useEffect(() => {
     async function getHelmReleases() {
       const data: HelmReleaseData[] = await fetchHelmReleases(
-        props.namespace.jsonData.metadata.name,
-        carProxyInfo
+        props.namespace.jsonData.metadata.name
       );
       setHelmReleases(data);
     }
 
     getHelmReleases();
-  }, [props, carProxyInfo]);
+  }, [props]);
 
   const defaultColumns = [
     {
       label: 'Name',
-      gridTemplate: 1,
+      gridTemplate: 'min-content',
       getter: element => {
         return (
           <Grid container justifyContent="space-between" alignItems="center" spacing={1}>
@@ -117,12 +79,19 @@ export default function HelmRelease(props: HelmReleaseProps) {
       label: 'Creation',
       gridTemplate: 'min-content',
       getter: element => {
-        return element.timestamp;
+        return <DateLabel date={new Date(element.timestamp).getTime()} format="mini" />;
+      },
+    },
+    {
+      label: 'Updated',
+      gridTemplate: 'min-content',
+      getter: element => {
+        return <DateLabel date={new Date(element.updatedTimestamp).getTime()} format="mini" />;
       },
     },
     {
       label: 'Chart',
-      gridTemplate: 1,
+      gridTemplate: 'min-content',
       getter: element => {
         return element.chart;
       },
@@ -154,65 +123,68 @@ export default function HelmRelease(props: HelmReleaseProps) {
                 size="small"
               />
             </Grid>
+            {element?.latestVersionInfo && (
+              <Grid item>
+                <PaddedChip
+                  label={
+                    <>
+                      <strong>{element.latestVersionInfo.version}</strong> available!
+                    </>
+                  }
+                  variant="outlined"
+                  size="small"
+                  color="success"
+                />
+              </Grid>
+            )}
           </Grid>
         );
       },
     },
     {
       label: 'Dependencies',
-      gridTemplate: 3,
       getter: element => {
-        if (!element.chartDependencies || element.chartDependencies.length === 0) {
+        if (!element.dependencies) {
           return <></>;
         }
 
+        const dependencies = element.dependencies as HelmReleaseDependency[];
         return (
           <Grid container direction="column" alignItems="start" spacing={1} size="grow">
-            {element.chartDependencies?.map(dependency => (
-              <Grid item>
-                <Grid container direction="row" alignItems="start" spacing={1} columns={2}>
-                  <Tooltip
-                    classes={{ tooltip: styles.tooltip }}
-                    title={getReleaseTooltip(dependency)}
-                  >
-                    <Grid item>
-                      <PaddedChip
-                        icon={dependency.error ? <SvgDanger></SvgDanger> : null}
-                        label={
-                          <>
-                            {dependency.name} <strong>{dependency.version}</strong>
-                          </>
-                        }
-                        size="small"
-                        sx={
-                          dependency.error || dependency.hasVersionInfo
-                            ? dependency.error
-                              ? { backgroundColor: orange[700] }
-                              : dependency.latestVersion
-                              ? { backgroundColor: amber[600] }
-                              : { backgroundColor: green[500] }
-                            : null
-                        }
-                      />
+            {dependencies
+              ?.filter(dep => !dep.indirect)
+              .map(
+                dependency =>
+                  carProxyInfo && (
+                    <Grid item key={dependency.name}>
+                      <DependencyItem dependency={dependency} carProxy={carProxyInfo} />
                     </Grid>
-                  </Tooltip>
-                  {dependency.latestVersion && (
-                    <Grid item>
-                      <PaddedChip
-                        label={
-                          <>
-                            <strong>{dependency.latestVersion}</strong> available!
-                          </>
-                        }
-                        variant="outlined"
-                        size="small"
-                        color="success"
-                      />
+                  )
+              )}
+          </Grid>
+        );
+      },
+    },
+    {
+      label: 'Indirect Dependencies',
+      getter: element => {
+        if (!element.dependencies) {
+          return <></>;
+        }
+
+        const dependencies = element.dependencies as HelmReleaseDependency[];
+        return (
+          <Grid container direction="column" alignItems="start" spacing={1} size="grow">
+            {dependencies
+              ?.filter(dep => dep.indirect)
+              .map(
+                dependency =>
+                  carProxyInfo && (
+                    <Grid item key={dependency.name}>
+                      <DependencyItem dependency={dependency} carProxy={carProxyInfo} />
                     </Grid>
-                  )}
-                </Grid>
-              </Grid>
-            ))}
+                  )
+              )}
           </Grid>
         );
       },
@@ -232,11 +204,9 @@ export default function HelmRelease(props: HelmReleaseProps) {
 
   return (
     <>
-      {releases && releases.length > 0 && (
-        <SectionBox title={'Releases'}>
-          <SimpleTable columns={defaultColumns} data={releases} />
-        </SectionBox>
-      )}
+      <SectionBox title={'Releases'}>
+        <SimpleTable columns={defaultColumns} data={releases} />
+      </SectionBox>
     </>
   );
 }

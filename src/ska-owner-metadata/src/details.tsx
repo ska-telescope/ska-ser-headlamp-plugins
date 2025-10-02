@@ -68,7 +68,7 @@ export function OwnershipDetails(props: OwnershipDetailsProps) {
 
   const mainRows = [
     {
-      name: 'Status',
+      name: 'Operational Status',
       value: namespace_status && (
         <StatusLabel
           status={

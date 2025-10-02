@@ -38,17 +38,21 @@ js-do-install:
 
 js-do-lint:
 	@for PLUGIN in $(PLUGINS); do \
-		cd $(PLUGINS_DIR)/$$PLUGIN; \
-			$(JS_PACKAGE_MANAGER) run lint; \
-		cd -; \
+		if [ "$$PLUGIN" != "flux" ]; then \
+			cd $(PLUGINS_DIR)/$$PLUGIN; \
+				$(JS_PACKAGE_MANAGER) run lint; \
+			cd -; \
+		fi; \
 	done
 
 js-do-format:
 	@for PLUGIN in $(PLUGINS); do \
-		cd $(PLUGINS_DIR)/$$PLUGIN; \
-			$(JS_PACKAGE_MANAGER) run lint-fix; \
-			$(JS_PACKAGE_MANAGER) run format; \
-		cd -; \
+		if [ "$$PLUGIN" != "flux" ]; then \
+			cd $(PLUGINS_DIR)/$$PLUGIN; \
+				$(JS_PACKAGE_MANAGER) run lint-fix; \
+				$(JS_PACKAGE_MANAGER) run format; \
+			cd -; \
+		fi; \
 	done
 
 js-do-audit:
@@ -69,6 +73,7 @@ oci-pre-build-all:
 	@rm -rf $(PLUGINS_OUTPUT_DIR)
 
 dev:
+	@$(MAKE) stop-dev || true
 	@for PLUGIN in $(PLUGINS); do \
 		cd $(PLUGINS_DIR)/$$PLUGIN; \
 			$(JS_PACKAGE_MANAGER) run start & \
@@ -76,7 +81,7 @@ dev:
 	done; \
 
 stop-dev:
-	@PROCESSES=$$(ps -au | egrep "node.*headlamp-plugin start" | awk '{print $$2}' | xargs); \
+	@PROCESSES=$$(ps -aux | egrep "node.*headlamp-plugin start" | awk '{print $$2}' | xargs); \
 	for PROCESS in $$PROCESSES; do \
 		kill -9 $$PROCESS; \
 	done;

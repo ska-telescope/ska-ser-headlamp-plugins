@@ -16,7 +16,7 @@ Currently, the SKA Headlamp Plugins provides the following plugins:
 - [x] ska-organization: Custom tabs with namespace information per SKAO Team, User and Project
 - [x] ska-helm-release: Information on installed releases in a namespace
 - [x] flux: Information on FluxCD resources (BETA)
-- [ ] ska-tango: Support for TANGO (operator) CRDs
+- [x] ska-tango: Support SKA Tango Operator CRDs - DeviceServer and DatabaseDS - with TANGO DB information
 
 ## Plugins
 
@@ -53,12 +53,12 @@ git submodule update --init --recursive
 To test locally the plugins, start by installing the Headlamp app locally:
 
 ```
-VERSION=0.26.0 # Go to https://github.com/headlamp-k8s/headlamp/releases, get latest release
-wget https://github.com/headlamp-k8s/headlamp/releases/download/v$VERSION/Headlamp-$VERSION-linux-x64.tar.gz -o headlamp
-mkdir headlamp
-tar xf headlamp.tar.gz -C headlamp --strip-components 1
-cd headlamp
-./headlamp
+VERSION=0.34.0 # Go to https://github.com/headlamp-k8s/headlamp/releases, get latest release
+HEADLAMP_INSTALL_DIR=~/Apps/Headlamp-$VERSION-linux-x64
+mkdir $HEADLAMP_INSTALL_DIR
+cd $HEADLAMP_INSTALL_DIR
+wget https://github.com/headlamp-k8s/headlamp/releases/download/v$VERSION/Headlamp-$VERSION-linux-x64.tar.gz -O headlamp.tar.gz
+tar --strip-components=1 -xvf headlamp.tar.gz
 ```
 
 Afterwards, you deploy a plugin by doing:
@@ -75,4 +75,11 @@ Finally, you need to configure a valid cluster, by providing a kubeconfig. To do
 ```
 export KUBECONFIG=<path to kubeconfig 1>:<path to kubeconfig 2>:<path to kubeconfig n>
 kubectl config view --flatten > ~/.config/Headlamp/kubeconfigs/config
+```
+
+Now, you are ready to run headlamp:
+
+```
+cd $HEADLAMP_INSTALL_DIR
+./headlamp
 ```

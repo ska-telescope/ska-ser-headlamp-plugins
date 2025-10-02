@@ -1,6 +1,6 @@
 import { registerRoute, registerSidebarEntry } from '@kinvolk/headlamp-plugin/lib';
 import { SectionBox } from '@kinvolk/headlamp-plugin/lib/CommonComponents';
-import Typography from '@mui/material/Typography';
+import { Organization } from './organization';
 import OrganizationDetail from './organizationDetail';
 import OrganizationList from './organizationList';
 
@@ -42,11 +42,7 @@ registerRoute({
   name: 'skao',
   exact: true,
   component: () => {
-    return (
-      <SectionBox title="Overview" textAlign="center" paddingTop={2}>
-        <Typography>SKAO Overview</Typography>
-      </SectionBox>
-    );
+    return <Organization></Organization>;
   },
 });
 
